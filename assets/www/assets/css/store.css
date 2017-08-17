@@ -1,0 +1,57 @@
+.stores-s{
+  width:100%;
+  height:130px;
+  padding:15px;
+}
+.stores-s-l{
+  width: 100px;
+  height: 100px;
+}
+.stores-s-l > img{
+  border-radius: 6px;
+}
+.stores-s-c{
+  margin-left: 110px;
+  height: 100%;
+}
+.stores-s-c-s{
+  border: 1px solid #FD832F;
+  color: #FD832F;
+  border-radius: 3px;
+  padding: 0px 4px;
+  margin-right: 10px;
+  font-size: 12px;
+}
+.stores-s-c-i{
+  width: 100px;
+  background: #FD832F;
+  color: white;
+  border-radius: 2px;
+  font-size: 12px;
+  text-align: center;
+  padding: 4px;
+  margin-top: 6px;
+}
+.stores-s-cf{
+  background-image: url(../../assets/img/confirm.png);
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 40px;
+  height: 40px;
+}
+.stores-time{
+  height: 40px;
+  background-size: 30px;
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  line-height: 40px;
+  padding-left: 55px;
+  color: #666;
+}
+.stores-time-1{
+  background-image: url(../../assets/img/open.png);
+}
+.stores-time-2{
+  background-image: url(../../assets/img/close.png);
+}
