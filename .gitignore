@@ -15,3 +15,5 @@ out
 .gradle/
 .idea/
 sunshinelife.iml
+CordovaLib/build
+CordovaLib/CordovaLib.iml
