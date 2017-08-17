@@ -1,0 +1,75 @@
+原生功能
+
+1.上传图片接口【回调返回】(图片上传到阿里云，并返回上传好的图片地址)
+	1.1从本地选择图片
+	1.2从相机拍照
+	1.3如果图片宽度大于800,则等比压缩到800再上传
+
+
+	exec(success, error, "MyPlugin", "upImgMethod", [arg0]);
+
+	arg0 = {url:"上传接口"}
+
+	回调: （例如：）{code: 成功1，失败0, msg: 描述, imgUrl: “2017-03/12345.jpg,2017-03/12346.jpg"}
+
+2.定位(Android需集成第三方,ios系统自带)【回调返回】
+	exec(success, error, "MyPlugin", "positionMethod", [arg0]);
+
+	arg0 : null
+
+	回调: {		code: 成功1，失败0,
+			msg: 描述,
+			lng:经度
+			lat:经度
+			radius:半径（没有为-1）
+			province:省（如果能取到）
+			city：市（如果能取到）
+			county：区、县（如果能取到）
+			addr:详情地址（如果有则返回，没有就为空）}
+
+3.分享【回调返回】
+	exec(success, error, "MyPlugin", "shareUrlMethod", [arg0]);
+
+	arg0 = {"pic":"图片地址绝对路径","title":"标题","desc":"描述","url":"实际跳转地址"}
+
+	回调 : {code: 成功1，失败0, msg: 描述}
+
+4.三方登录【回调返回】
+	exec(success, error, "MyPlugin", "extLoginMethod", [arg0]);
+
+	arg0 = {type: 种类（1微信，2QQ）}
+
+	回调 : {	code: 成功1，失败0
+		msg: 描述
+		unionid:平台ID
+		face:用户头像url
+		nikename:昵称
+		sex:性别（男，女，未知）
+		city:城市（如果没有就为空）}
+
+5.支付【回调返回】
+	exec(success, error, "MyPlugin", "payMethod", [arg0]);
+
+	arg0 = {"type":"1,支付宝，2微信","orderId":"订单号","}
+
+	回调 : {"code":1成功，0失败，"msg":"描述"}
+
+6.获取推送token【回调返回】
+	exec(success, error, "MyPlugin", "getPushTokenMethod", [arg0]);
+
+	arg0 : null
+
+	回调 : {"code":1成功,0失败，"msg":"描述”,”type","友盟、极光 推送名字，如果未获取或者没有推送端则为空","token":"设置token"}
+
+
+
+7.设置推送【回调返回】(暂定)
+	native_fns("setPush", jsonObj, t);
+	jsonObj : {act:"get,set",value:1,2}
+
+	nativeFunction.nativeCallback(d, t);
+	d : {"code":1成功,0失败，"msg":"描述”}
+
+	//参数说明：act=get，获取当前推荐状态；act=set:设置推荐状态，状态值：0为关闭，1为打开
+		结果：act=get,返回当前状态（0，1）；act=set,返回是否设置成功（0，1）
+		返回：结果,code
