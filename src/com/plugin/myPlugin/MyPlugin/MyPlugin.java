@@ -1,5 +1,6 @@
 package com.plugin.myPlugin;
 
+import android.content.Intent;
 import android.util.Log;
 
 import org.apache.cordova.CordovaPlugin;
@@ -9,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import io.ionic.ygsh_y.MediaPlayerActivity;
+
 /**
  * This class echoes a string called from JavaScript.
  */
@@ -17,12 +20,11 @@ public class MyPlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        Log.i(TAG, "Plug in execute action = " + action + " , args = " + args.toString());
+        Log.i(TAG, "Plugin execute action = " + action + " , args = " + args.toString());
 
         switch (action) {
             case "coolMethod":  //test
-                String message = args.getString(0);
-                this.coolMethod(message, callbackContext);
+                playVideo("");
                 return true;
             case "upImgMethod":  //上传图片到阿里云
                 return true;
@@ -47,5 +49,11 @@ public class MyPlugin extends CordovaPlugin {
         } else {
             callbackContext.error("Expected one non-empty string argument.");
         }
+    }
+
+    private void playVideo(String url) {
+        Intent intent = new Intent(cordova.getActivity(), MediaPlayerActivity.class);
+        intent.putExtra("url", url);
+        cordova.getActivity().startActivity(intent);
     }
 }
