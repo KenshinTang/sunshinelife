@@ -1,7 +1,6 @@
 package io.ionic.ygsh_y;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.SurfaceHolder;
@@ -10,7 +9,7 @@ import android.view.SurfaceView;
 import java.io.IOException;
 
 public class MediaPlayerActivity extends Activity implements SurfaceHolder.Callback {
-
+    private static final String URL = "http://baobab.wdjcdn.com/1456117847747a_x264.mp4";  //需求要求播放地址写死
     private MediaPlayer mMediaPlayer;
 
     @Override
@@ -21,13 +20,9 @@ public class MediaPlayerActivity extends Activity implements SurfaceHolder.Callb
         SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
         surfaceView.getHolder().addCallback(this);
 
-        Intent intent = getIntent();
-        String url = intent.getStringExtra("url");
-        url = "http://baobab.wdjcdn.com/1456117847747a_x264.mp4";
-
         mMediaPlayer = new MediaPlayer();
         try {
-            mMediaPlayer.setDataSource(url);
+            mMediaPlayer.setDataSource(URL);
 
         } catch (IOException e) {
             e.printStackTrace();
