@@ -1,4 +1,4 @@
-package com.plugin.myPlugin;
+package com.plugin.myPlugin.MyPlugin;
 
 import android.content.Intent;
 import android.util.Log;
