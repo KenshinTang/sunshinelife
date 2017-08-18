@@ -24,7 +24,7 @@ public class MyPlugin extends CordovaPlugin {
 
         switch (action) {
             case "coolMethod":  //test
-                playVideo("");
+                playVideo();
                 return true;
             case "upImgMethod":  //上传图片到阿里云
                 return true;
@@ -51,9 +51,8 @@ public class MyPlugin extends CordovaPlugin {
         }
     }
 
-    private void playVideo(String url) {
+    private void playVideo() {
         Intent intent = new Intent(cordova.getActivity(), MediaPlayerActivity.class);
-        intent.putExtra("url", url);
         cordova.getActivity().startActivity(intent);
     }
 }
