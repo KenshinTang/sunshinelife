@@ -17,3 +17,4 @@ out
 sunshinelife.iml
 CordovaLib/build
 CordovaLib/CordovaLib.iml
+*.iml
