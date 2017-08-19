@@ -3,6 +3,7 @@ package com.plugin.myPlugin;
 import android.content.Intent;
 import android.util.Log;
 
+import com.yunlinker.ygsh.MapLocation;
 import com.yunlinker.ygsh.R;
 
 import org.apache.cordova.CordovaPlugin;
@@ -31,6 +32,7 @@ public class MyPlugin extends CordovaPlugin {
             case "upImgMethod":  //上传图片到阿里云
                 return true;
             case "positionMethod":  //获取定位
+                showMapLocation();
                 return true;
             case "shareUrlMethod":  //分享
                 showShare();
@@ -83,5 +85,10 @@ public class MyPlugin extends CordovaPlugin {
 
         // 启动分享GUI
         oks.show(cordova.getActivity());
+    }
+
+    private void showMapLocation() {
+        Intent intent = new Intent(cordova.getActivity(), MapLocation.class);
+        cordova.getActivity().startActivity(intent);
     }
 }

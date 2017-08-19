@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yunlinker.ygsh"
-    android:hardwareAccelerated="true"
     android:versionCode="10000"
     android:versionName="1.0.0">
 
@@ -17,6 +16,10 @@
         android:smallScreens="true"
         android:xlargeScreens="true" />
 
+    <!-- OpenGLES 2.0 -->
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -36,7 +39,9 @@
         android:label="@string/app_name"
         android:name="com.yunlinker.ygsh.YunApplication"
         android:supportsRtl="true">
-
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="of4mRHXh0ngTRzNKq6i13wRhdTtEV2lN" />
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
@@ -79,6 +84,13 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:screenOrientation="portrait" />
+        <activity android:name=".MapLocation"/>
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote" >
+        </service>
+
     </application>
 
 </manifest>
