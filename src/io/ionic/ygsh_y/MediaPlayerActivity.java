@@ -56,4 +56,15 @@ public class MediaPlayerActivity extends Activity implements SurfaceHolder.Callb
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
     }
+
+    @Override
+    protected void onDestroy() {
+        if (mMediaPlayer != null) {
+            mMediaPlayer.stop();
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
+
+        super.onDestroy();
+    }
 }
