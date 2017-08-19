@@ -1,4 +1,4 @@
-package io.ionic.ygsh_y;
+package com.yunlinker.ygsh;
 
 import android.app.Activity;
 import android.media.MediaPlayer;

@@ -17,7 +17,7 @@
        under the License.
  */
 
-package io.ionic.ygsh_y;
+package com.yunlinker.ygsh;
 
 import android.os.Bundle;
 import org.apache.cordova.*;
