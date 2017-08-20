@@ -183,7 +183,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
     public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
         Log.d("allen","onGetReverseGeoCodeResult");
         List<PoiInfo> poiInfos = reverseGeoCodeResult.getPoiList();
-        if (poiInfos.isEmpty()) {
+        if (poiInfos ==null || poiInfos.isEmpty()) {
             return;
         }
         dataList.clear();
@@ -196,6 +196,9 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
 //        MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(location);
 //        mBaiduMap.animateMapStatus(u);
         mCurrentMarker.setPosition(location);
+        mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(reverseGeoCodeResult
+                .getLocation()));
+
     }
 
 
@@ -271,6 +274,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
         mapHeadView.setVisibility(View.VISIBLE);
         mapLayout.setVisibility(View.VISIBLE);
         mListView.setVisibility(View.VISIBLE);
+        mSearchEditView.setText("");
     }
     private void initView() {
         dataList = new ArrayList<>();
@@ -281,10 +285,21 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
         mRequestLocation = (Button) findViewById(R.id.request);
         mListView = (ListView) findViewById(R.id.lv_location_nearby);
         mSearchPoisList = (ListView) findViewById(R.id.search_pois_list);
+        mSearchPoisList.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                //// FIXME: 2017/8/20
+                showMapView();
+                PoiInfo item = (PoiInfo)mSearchPoisList.getAdapter().getItem(position);
+                mSearch.reverseGeoCode(new ReverseGeoCodeOption()
+                        .location(item.location));
+            }
+        });
         checkPosition = 0;
         adapter = new ListAdapter(0);
         mListView.setAdapter(adapter);
-        mSearchPoisList.setAdapter(adapter);
         mSearch = GeoCoder.newInstance();
 
         mSearchEditView = (SearchEditView) findViewById(R.id.search_location);
@@ -314,7 +329,6 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                     poiCitySearchOption.city(city);
                     //分页编号
                     poiCitySearchOption.pageNum(0);
-                    poiSearch.searchInCity(poiCitySearchOption);
                     //设置poi检索监听者
                     poiSearch.setOnGetPoiSearchResultListener(new OnGetPoiSearchResultListener() {
                         //poi 查询结果回调
@@ -339,6 +353,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                             Log.d("allen", "onGetPoiResult");
                         }
                     });
+                    poiSearch.searchInCity(poiCitySearchOption);
                 }
             }
         });
