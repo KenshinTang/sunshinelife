@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,14 +62,12 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.baidu.mapapi.search.poi.OnGetPoiSearchResultListener;
 import com.baidu.mapapi.search.poi.PoiCitySearchOption;
 import com.baidu.mapapi.search.poi.PoiDetailResult;
-import com.baidu.mapapi.search.poi.PoiDetailSearchOption;
 import com.baidu.mapapi.search.poi.PoiIndoorResult;
 import com.baidu.mapapi.search.poi.PoiNearbySearchOption;
 import com.baidu.mapapi.search.poi.PoiResult;
 import com.baidu.mapapi.search.poi.PoiSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
 import com.baidu.mapapi.utils.CoordinateConverter;
-import com.yunlinker.ygsh.mapapi.overlayutil.PoiOverlay;
 import com.yunlinker.ygsh.util.ToastUtil;
 import com.yunlinker.ygsh.view.SearchEditView;
 
@@ -113,15 +112,19 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
     private List<PoiInfo> dataList;
     private ListAdapter adapter;
 
-    private int locType;
     private double longitude;// 精度
     private double latitude;// 维度
     private float radius;// 定位精度半径，单位是米
+    private int locType;
     private String addrStr;// 反地理编码
     private String province;// 省份信息
     private String city;// 城市信息
     private String district;// 区县信息
     private float direction;// 手机方向信息
+    private ListView mSearchPoisList;
+    private LatLng locationLatLng;
+    private RelativeLayout mapHeadView;
+    private RelativeLayout mapLayout;
 
     /**
      * 构造广播监听类，监听 SDK key 验证以及网络异常广播
@@ -173,7 +176,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
 
     @Override
     public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
-
+        Log.d("allen","onGetGeoCodeResult");
     }
 
     @Override
@@ -258,15 +261,30 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
         }
     }
 
+    private void hideMapView() {
+        mapHeadView.setVisibility(View.GONE);
+        mapLayout.setVisibility(View.GONE);
+        mListView.setVisibility(View.GONE);
+    }
+
+    private void showMapView() {
+        mapHeadView.setVisibility(View.VISIBLE);
+        mapLayout.setVisibility(View.VISIBLE);
+        mListView.setVisibility(View.VISIBLE);
+    }
     private void initView() {
         dataList = new ArrayList<>();
+        mapHeadView = (RelativeLayout) findViewById(R.id.map_head_view);
+        mapLayout = (RelativeLayout) findViewById(R.id.map_layout);
         mMapView = (MapView) findViewById(R.id.bmapView);
         mSendButton = (TextView) findViewById(R.id.send_btn);
         mRequestLocation = (Button) findViewById(R.id.request);
         mListView = (ListView) findViewById(R.id.lv_location_nearby);
+        mSearchPoisList = (ListView) findViewById(R.id.search_pois_list);
         checkPosition = 0;
         adapter = new ListAdapter(0);
         mListView.setAdapter(adapter);
+        mSearchPoisList.setAdapter(adapter);
         mSearch = GeoCoder.newInstance();
 
         mSearchEditView = (SearchEditView) findViewById(R.id.search_location);
@@ -284,6 +302,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() == 0 || "".equals(s.toString())) {
+                    mSearchPoisList.setVisibility(View.GONE);
                 } else {
                     //创建PoiSearch实例
                     PoiSearch poiSearch = PoiSearch.newInstance();
@@ -293,10 +312,8 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                     poiCitySearchOption.keyword(s.toString());
                     //城市
                     poiCitySearchOption.city(city);
-                    //设置每页容量，默认为每页10条
-                    poiCitySearchOption.pageCapacity(10);
                     //分页编号
-                    poiCitySearchOption.pageNum(1);
+                    poiCitySearchOption.pageNum(0);
                     poiSearch.searchInCity(poiCitySearchOption);
                     //设置poi检索监听者
                     poiSearch.setOnGetPoiSearchResultListener(new OnGetPoiSearchResultListener() {
@@ -304,17 +321,22 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                         @Override
                         public void onGetPoiResult(PoiResult poiResult) {
                             List<PoiInfo> poiInfos = poiResult.getAllPoi();
-                            Log.d("allen", poiInfos.toArray().toString());
+                            Log.d("allen", "onGetPoiResult");
+                            PoiSearchAdapter poiSearchAdapter = new PoiSearchAdapter(mContext, poiInfos, locationLatLng);
+                            mSearchPoisList.setVisibility(View.VISIBLE);
+                            mSearchPoisList.setAdapter(poiSearchAdapter);
+                            hideMapView();
                         }
 
                         //poi 详情查询结果回调
                         @Override
                         public void onGetPoiDetailResult(PoiDetailResult poiDetailResult) {
+                            Log.d("allen", "onGetPoiResult");
                         }
 
                         @Override
                         public void onGetPoiIndoorResult(PoiIndoorResult poiIndoorResult) {
-
+                            Log.d("allen", "onGetPoiResult");
                         }
                     });
                 }
@@ -473,14 +495,13 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
             province = location.getProvince();// 省份
             city = location.getCity();// 城市
             district = location.getDistrict();// 区县
-
-            LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
+            locationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
             //将当前位置加入List里面
             PoiInfo info = new PoiInfo();
             info.address = location.getAddrStr();
             info.city = location.getCity();
-            info.location = ll;
+            info.location = locationLatLng;
             info.name = location.getAddrStr();
             dataList.add(info);
             adapter.notifyDataSetChanged();
@@ -495,13 +516,13 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                     .longitude(location.getLongitude()).build();
             mBaiduMap.setMyLocationData(locData);
 
-            //画标志
-            CoordinateConverter converter = new CoordinateConverter();
-            converter.coord(ll);
-            converter.from(CoordinateConverter.CoordType.COMMON);
-            LatLng convertLatLng = converter.convert();
+//            //画标志
+//            CoordinateConverter converter = new CoordinateConverter();
+//            converter.coord(locationLatLng);
+//            converter.from(CoordinateConverter.CoordType.COMMON);
+//            LatLng convertLatLng = converter.convert();
 
-            OverlayOptions ooA = new MarkerOptions().position(ll).icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_marka));
+            OverlayOptions ooA = new MarkerOptions().position(locationLatLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_marka));
             mCurrentMarker = (Marker) mBaiduMap.addOverlay(ooA);
 
 
@@ -509,7 +530,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
 //            mBaiduMap.animateMapStatus(u);
 
             //画当前定位标志
-            MapStatusUpdate uc = MapStatusUpdateFactory.newLatLng(ll);
+            MapStatusUpdate uc = MapStatusUpdateFactory.newLatLng(locationLatLng);
             mBaiduMap.animateMapStatus(uc);
 
             mMapView.showZoomControls(false);
@@ -593,7 +614,8 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
     }
 
 
-    class ListAdapter extends BaseAdapter {
+
+    private class ListAdapter extends BaseAdapter {
 
         private int checkPosition;
 
@@ -660,6 +682,60 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
         TextView textView;
         TextView textAddress;
         ImageView imageLl;
+    }
+
+    private class PoiSearchAdapter extends BaseAdapter {
+
+        private Context context;
+        private List<PoiInfo> poiInfos;
+        private final LatLng locationLatLng;
+
+        public PoiSearchAdapter(Context context, List<PoiInfo> poiInfos, LatLng locationLatLng) {
+            this.context = context;
+            this.poiInfos = poiInfos;
+            this.locationLatLng = locationLatLng;
+        }
+
+        @Override
+        public int getCount() {
+            return poiInfos.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return poiInfos.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder holder = null;
+            if (convertView == null) {
+                convertView = LayoutInflater.from(context).inflate(R.layout.poisearch_item, null);
+                holder = new ViewHolder(convertView);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+            PoiInfo poiInfo = poiInfos.get(position);
+            holder.mPoisearchName.setText(poiInfo.name);
+            holder.mPoisearchAddress.setText(poiInfo.address);
+            return convertView;
+        }
+
+        class ViewHolder {
+            TextView mPoisearchName;
+            TextView mPoisearchAddress;
+
+            public ViewHolder(View view) {
+                mPoisearchName = (TextView) view.findViewById(R.id.poisearch_name);
+                mPoisearchAddress = (TextView) view.findViewById(R.id.poisearch_address);
+            }
+        }
     }
 
     @Override
