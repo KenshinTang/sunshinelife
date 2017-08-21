@@ -7,9 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -63,7 +61,6 @@ import com.baidu.mapapi.search.poi.OnGetPoiSearchResultListener;
 import com.baidu.mapapi.search.poi.PoiCitySearchOption;
 import com.baidu.mapapi.search.poi.PoiDetailResult;
 import com.baidu.mapapi.search.poi.PoiIndoorResult;
-import com.baidu.mapapi.search.poi.PoiNearbySearchOption;
 import com.baidu.mapapi.search.poi.PoiResult;
 import com.baidu.mapapi.search.poi.PoiSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
@@ -80,7 +77,7 @@ import java.util.List;
  * date:  2017/8/19 16:33<br>
  * description:
  */
-public class MapLocation extends Activity implements OnGetPoiSearchResultListener, BaiduMap.OnMapStatusChangeListener ,OnGetGeoCoderResultListener {
+public class MapLocation extends Activity implements OnGetPoiSearchResultListener, BaiduMap.OnMapStatusChangeListener {
 
     private Context mContext;
 
@@ -89,42 +86,27 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
 
     private TextView mSendButton;
     private Button mRequestLocation;
-    private ListView mListView;
+    private ListView mSearchResultList;
 
     // 搜索周边相关
     private PoiSearch mPoiSearch = null;
-    private SuggestionSearch mSuggestionSearch = null;
 
     /**
      * 定位SDK的核心类
      */
     public LocationClient mLocationClient = null;
 
-    /**
-     * 当前标志
-     */
-    private Marker mCurrentMarker;
-    // 定位图标描述
-    private BitmapDescriptor currentMarker = null;
-
     public BDLocationListener myListener = new MyLocationListener();
 
-    private List<PoiInfo> dataList;
-    private ListAdapter adapter;
 
-    private double longitude;// 精度
-    private double latitude;// 维度
+    private ListAdapter adapter;
     private float radius;// 定位精度半径，单位是米
-    private int locType;
     private String addrStr;// 反地理编码
-    private String province;// 省份信息
     private String city;// 城市信息
-    private String district;// 区县信息
-    private float direction;// 手机方向信息
     private ListView mSearchPoisList;
-    private LatLng locationLatLng;
     private RelativeLayout mapHeadView;
     private RelativeLayout mapLayout;
+    private String TAG = "allen";
 
     /**
      * 构造广播监听类，监听 SDK key 验证以及网络异常广播
@@ -148,57 +130,22 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
     private SDKReceiver mReceiver;
     
     private int checkPosition;
+    //搜索editText
     private SearchEditView mSearchEditView;
-    private GeoCoder mSearch;
-    private boolean mMove;
     @Override
     public void onMapStatusChangeStart(MapStatus mapStatus) {
         Log.d("allen","onMapStatusChangeStart");
-        mMove = true;
     }
 
     @Override
     public void onMapStatusChange(MapStatus mapStatus) {
         Log.d("allen","onMapStatusChange");
     }
-
+    //移动地图对附近做搜索
     @Override
     public void onMapStatusChangeFinish(MapStatus mapStatus) {
         Log.d("allen","onMapStatusChangeFinish");
-        if (mMove) {
-            //地图操作的中心点
-            LatLng ptCenter = mapStatus.target;
-            mSearch.reverseGeoCode(new ReverseGeoCodeOption()
-                    .location(ptCenter));
-            mMove = false;
-        }
-    }
-
-    @Override
-    public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
-        Log.d("allen","onGetGeoCodeResult");
-    }
-
-    @Override
-    public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
-        Log.d("allen","onGetReverseGeoCodeResult");
-        List<PoiInfo> poiInfos = reverseGeoCodeResult.getPoiList();
-        if (poiInfos ==null || poiInfos.isEmpty()) {
-            return;
-        }
-        dataList.clear();
-        dataList.addAll(poiInfos);
-        checkPosition = 0;
-        adapter.setCheckPosition(0);
-        adapter.notifyDataSetChanged();
-        mListView.setSelection(0);
-        LatLng location = poiInfos.get(0).location;
-//        MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(location);
-//        mBaiduMap.animateMapStatus(u);
-        mCurrentMarker.setPosition(location);
-        mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(reverseGeoCodeResult
-                .getLocation()));
-
+        searchMoveFinish(mapStatus);
     }
 
 
@@ -267,40 +214,35 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
     private void hideMapView() {
         mapHeadView.setVisibility(View.GONE);
         mapLayout.setVisibility(View.GONE);
-        mListView.setVisibility(View.GONE);
+        mSearchResultList.setVisibility(View.GONE);
     }
 
     private void showMapView() {
         mapHeadView.setVisibility(View.VISIBLE);
         mapLayout.setVisibility(View.VISIBLE);
-        mListView.setVisibility(View.VISIBLE);
+        mSearchResultList.setVisibility(View.VISIBLE);
         mSearchEditView.setText("");
     }
     private void initView() {
-        dataList = new ArrayList<>();
         mapHeadView = (RelativeLayout) findViewById(R.id.map_head_view);
         mapLayout = (RelativeLayout) findViewById(R.id.map_layout);
         mMapView = (MapView) findViewById(R.id.bmapView);
         mSendButton = (TextView) findViewById(R.id.send_btn);
         mRequestLocation = (Button) findViewById(R.id.request);
-        mListView = (ListView) findViewById(R.id.lv_location_nearby);
+        mSearchResultList = (ListView) findViewById(R.id.lv_location_nearby);
         mSearchPoisList = (ListView) findViewById(R.id.search_pois_list);
         mSearchPoisList.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                //// FIXME: 2017/8/20
                 showMapView();
                 PoiInfo item = (PoiInfo)mSearchPoisList.getAdapter().getItem(position);
-                mSearch.reverseGeoCode(new ReverseGeoCodeOption()
-                        .location(item.location));
+                Log.d(TAG, "onItemClick: poiInfo"+item.name+" "+item.address+" "+item.location.toString());
             }
         });
-        checkPosition = 0;
         adapter = new ListAdapter(0);
-        mListView.setAdapter(adapter);
-        mSearch = GeoCoder.newInstance();
+        mSearchResultList.setAdapter(adapter);
 
         mSearchEditView = (SearchEditView) findViewById(R.id.search_location);
         mSearchEditView.addTextChangedListener(new TextWatcher() {
@@ -335,8 +277,8 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                         @Override
                         public void onGetPoiResult(PoiResult poiResult) {
                             List<PoiInfo> poiInfos = poiResult.getAllPoi();
-                            Log.d("allen", "onGetPoiResult");
-                            PoiSearchAdapter poiSearchAdapter = new PoiSearchAdapter(mContext, poiInfos, locationLatLng);
+                            Log.d(TAG, "onGetPoiResult");
+                            PoiSearchAdapter poiSearchAdapter = new PoiSearchAdapter(mContext, poiInfos);
                             mSearchPoisList.setVisibility(View.VISIBLE);
                             mSearchPoisList.setAdapter(poiSearchAdapter);
                             hideMapView();
@@ -345,12 +287,12 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                         //poi 详情查询结果回调
                         @Override
                         public void onGetPoiDetailResult(PoiDetailResult poiDetailResult) {
-                            Log.d("allen", "onGetPoiResult");
+                            Log.d(TAG, "onGetPoiResult");
                         }
 
                         @Override
                         public void onGetPoiIndoorResult(PoiIndoorResult poiIndoorResult) {
-                            Log.d("allen", "onGetPoiResult");
+                            Log.d(TAG, "onGetPoiResult");
                         }
                     });
                     poiSearch.searchInCity(poiCitySearchOption);
@@ -376,7 +318,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Log.d("allen", "onBackPress");
+        Log.d(TAG, "onBackPress");
     }
 
     private void hideKeyboard(IBinder token) {
@@ -411,8 +353,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
      * 事件初始化
      */
     private void initEvent() {
-        mSearch.setOnGetGeoCodeResultListener(this);
-        mListView.setOnItemClickListener(new OnItemClickListener() {
+        mSearchResultList.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -421,9 +362,8 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                 adapter.setCheckPosition(position);
                 adapter.notifyDataSetChanged();
                 PoiInfo ad = (PoiInfo) adapter.getItem(position);
-//                MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(ad.location);
-//                mBaiduMap.animateMapStatus(u);
-                mCurrentMarker.setPosition(ad.location);
+                MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(ad.location);
+                mBaiduMap.setMapStatus(u);
             }
         });
 
@@ -440,7 +380,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
 
             @Override
             public void onClick(View v) {
-                PoiInfo poiInfo = dataList.get(checkPosition);
+                PoiInfo poiInfo = (PoiInfo) adapter.getItem(checkPosition);
                 ToastUtil.show(getApplicationContext(), "名称是: " + poiInfo.name + " 地址是：" + poiInfo.address
                         + "纬度是: " + poiInfo.location.latitude + "经度是: " + poiInfo.location.longitude);
             }
@@ -465,13 +405,10 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
         // 定位初始化
         mLocationClient = new LocationClient(getApplicationContext()); // 声明LocationClient类
         mLocationClient.registerLocationListener(myListener);// 注册定位监听接口
-
-        /**
-         * 设置定位参数
-         */
+        //设置定位参数
         LocationClientOption option = new LocationClientOption();
         option.setLocationMode(LocationMode.Hight_Accuracy);// 设置定位模式
-//		option.setScanSpan(5000);// 设置发起定位请求的间隔时间,ms
+        option.setCoorType("bd09ll");
         option.setNeedDeviceDirect(true);// 设置返回结果包含手机的方向
         option.setOpenGps(true);
         option.setIsNeedAddress(true);// 返回的定位结果包含地址信息
@@ -485,44 +422,24 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
      *
      * @author
      */
-    public class MyLocationListener implements BDLocationListener {
+    private class MyLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
             if (location == null || mMapView == null) {
                 return;
             }
-
-            locType = location.getLocType();
-            Log.i("allen", "当前定位的返回值是：" + locType);
-
-            longitude = location.getLongitude();
-            latitude = location.getLatitude();
+            int locType = location.getLocType();
+            Log.i(TAG, "当前定位的返回值是：" + locType);
             if (location.hasRadius()) {// 判断是否有定位精度半径
                 radius = location.getRadius();
             }
 
             if (locType == BDLocation.TypeNetWorkLocation) {
                 addrStr = location.getAddrStr();// 获取反地理编码(文字描述的地址)
-                Log.i("allen", "当前定位的地址是：" + addrStr);
+                Log.i(TAG, "当前定位的地址是：" + addrStr);
             }
-
-            direction = location.getDirection();// 获取手机方向，【0~360°】,手机上面正面朝北为0°
-            province = location.getProvince();// 省份
             city = location.getCity();// 城市
-            district = location.getDistrict();// 区县
-            locationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-            //将当前位置加入List里面
-            PoiInfo info = new PoiInfo();
-            info.address = location.getAddrStr();
-            info.city = location.getCity();
-            info.location = locationLatLng;
-            info.name = location.getAddrStr();
-            dataList.add(info);
-            adapter.notifyDataSetChanged();
-            Log.i("allen", "province是：" + province + " city是" + city + " 区县是: " + district);
-
-
+            LatLng locationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
             // 构造定位数据
             MyLocationData locData = new MyLocationData.Builder()
                     .accuracy(location.getRadius())
@@ -531,91 +448,58 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                     .longitude(location.getLongitude()).build();
             mBaiduMap.setMyLocationData(locData);
 
-//            //画标志
-//            CoordinateConverter converter = new CoordinateConverter();
-//            converter.coord(locationLatLng);
-//            converter.from(CoordinateConverter.CoordType.COMMON);
-//            LatLng convertLatLng = converter.convert();
-
-            OverlayOptions ooA = new MarkerOptions().position(locationLatLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_marka));
-            mCurrentMarker = (Marker) mBaiduMap.addOverlay(ooA);
-
-
-//            MapStatusUpdate u = MapStatusUpdateFactory.newLatLngZoom(convertLatLng, 17.0f);
-//            mBaiduMap.animateMapStatus(u);
-
-            //画当前定位标志
-            MapStatusUpdate uc = MapStatusUpdateFactory.newLatLng(locationLatLng);
-            mBaiduMap.animateMapStatus(uc);
-
             mMapView.showZoomControls(false);
-            //poi 搜索周边
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Looper.prepare();
-                    searchNearby();
-                    Looper.loop();
-                }
-            }).start();
 
+            // 创建POI检索实例
+            mPoiSearch = PoiSearch.newInstance();
+            // 设置监听器
+            mPoiSearch.setOnGetPoiSearchResultListener(MapLocation.this);
+            //设置地图中心点位置
+            MapStatus status = new MapStatus.Builder().target(locationLatLng).build();
+            searchMoveFinish(status);
+            MapStatusUpdate u = MapStatusUpdateFactory.newLatLngZoom(locationLatLng, 17.0f);
+            mBaiduMap.animateMapStatus(u);
         }
     }
 
-    /**
-     * 搜索周边
-     */
-    private void searchNearby() {
-        // POI初始化搜索模块，注册搜索事件监听
-        mPoiSearch = PoiSearch.newInstance();
-        mPoiSearch.setOnGetPoiSearchResultListener(this);
-        PoiNearbySearchOption poiNearbySearchOption = new PoiNearbySearchOption();
+    private void searchMoveFinish(MapStatus status) {
+        GeoCoder geoCoder = GeoCoder.newInstance();
+        ReverseGeoCodeOption reverseCoder = new ReverseGeoCodeOption();
+        reverseCoder.location(status.target);
+        Log.d(TAG, "searchMoveFinish: ");
+        geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
 
-        poiNearbySearchOption.keyword("美食");
-        poiNearbySearchOption.location(new LatLng(latitude, longitude));
-        poiNearbySearchOption.radius(500);  // 检索半径，单位是米
-        poiNearbySearchOption.pageCapacity(20);  // 默认每页10条
-        mPoiSearch.searchNearby(poiNearbySearchOption);  // 发起附近检索请求
-    }
-
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case 0:
-                    Log.i("----------------", "---------------------");
+            @Override
+            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult arg0) {
+                Log.d(TAG, "onGetReverseGeoCodeResult: 111");
+                if (arg0 != null && arg0.getPoiList() != null) {
+                    adapter.setData(arg0.getPoiList());
+                    mSearchResultList.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
-                    break;
-
-                default:
-                    break;
+                } else {
+                    ToastUtil.show(mContext,"没有更多了！");
+                }
             }
-        }
-    };
 
+            @Override
+            public void onGetGeoCodeResult(GeoCodeResult arg0) { //
+                Log.d(TAG, "onGetReverseGeoCodeResult: 111");
+            }
+        });
+        geoCoder.reverseGeoCode(reverseCoder); //
+    }
     /*
      * 接受周边地理位置结果
      */
     @Override
-    public void onGetPoiResult(PoiResult result) {
-        // 获取POI检索结果
-        if (result == null || result.error == SearchResult.ERRORNO.RESULT_NOT_FOUND) {// 没有找到检索结果
-            return;
+    public void onGetPoiResult(PoiResult poiResult) {
+        if (poiResult != null && poiResult.getAllPoi() != null) {
+            adapter.setData(poiResult.getAllPoi());
+            adapter.notifyDataSetChanged();
+        } else {
+            ToastUtil.show(mContext,"没有更多了！");
         }
-
-        if (result.error == SearchResult.ERRORNO.NO_ERROR) {// 检索结果正常返回
-//			mBaiduMap.clear();
-            if (result != null) {
-                if (result.getAllPoi() != null && result.getAllPoi().size() > 0) {
-                    dataList.addAll(result.getAllPoi());
-//					adapter.notifyDataSetChanged();
-                    Message msg = new Message();
-                    msg.what = 0;
-                    handler.sendMessage(msg);
-                }
-            }
-        }
+        adapter.setCheckPosition(0);
     }
 
     @Override
@@ -631,7 +515,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
 
 
     private class ListAdapter extends BaseAdapter {
-
+        private List<PoiInfo> dataList = new ArrayList<>();
         private int checkPosition;
 
         public ListAdapter(int checkPosition) {
@@ -642,27 +526,27 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
             this.checkPosition = checkPosition;
         }
 
+        public void setData(List<PoiInfo> dataList){
+            this.dataList = dataList;
+        }
+
         @Override
         public int getCount() {
-            // TODO Auto-generated method stub
             return dataList.size();
         }
 
         @Override
         public Object getItem(int position) {
-            // TODO Auto-generated method stub
             return dataList.get(position);
         }
 
         @Override
         public long getItemId(int position) {
-            // TODO Auto-generated method stub
-            return 0;
+            return position;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            // TODO Auto-generated method stub
             ViewHolder holder = null;
             if (convertView == null) {
                 holder = new ViewHolder();
@@ -703,12 +587,10 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
 
         private Context context;
         private List<PoiInfo> poiInfos;
-        private final LatLng locationLatLng;
 
-        public PoiSearchAdapter(Context context, List<PoiInfo> poiInfos, LatLng locationLatLng) {
+        public PoiSearchAdapter(Context context, List<PoiInfo> poiInfos) {
             this.context = context;
             this.poiInfos = poiInfos;
-            this.locationLatLng = locationLatLng;
         }
 
         @Override
