@@ -27,7 +27,7 @@ IOS开发者账号：
 密码：Yangguangshenghuo187
 
 
-友盟（推送消息）
+友盟（推送消息, 分享, 第三方登录）
 账号：3394608072@qq.com
 密码：He2006zhe220
 http://www.umeng.com/
