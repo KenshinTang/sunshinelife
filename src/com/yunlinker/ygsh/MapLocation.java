@@ -8,11 +8,11 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,19 +39,13 @@ import com.baidu.location.LocationClientOption;
 import com.baidu.location.LocationClientOption.LocationMode;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.map.BitmapDescriptor;
-import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
-import com.baidu.mapapi.map.Marker;
-import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
-import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.PoiInfo;
-import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
@@ -63,8 +57,6 @@ import com.baidu.mapapi.search.poi.PoiDetailResult;
 import com.baidu.mapapi.search.poi.PoiIndoorResult;
 import com.baidu.mapapi.search.poi.PoiResult;
 import com.baidu.mapapi.search.poi.PoiSearch;
-import com.baidu.mapapi.search.sug.SuggestionSearch;
-import com.baidu.mapapi.utils.CoordinateConverter;
 import com.yunlinker.ygsh.util.ToastUtil;
 import com.yunlinker.ygsh.view.SearchEditView;
 
@@ -238,6 +230,8 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                                     int position, long id) {
                 showMapView();
                 PoiInfo item = (PoiInfo)mSearchPoisList.getAdapter().getItem(position);
+                MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(item.location);
+                mBaiduMap.animateMapStatus(u);
                 Log.d(TAG, "onItemClick: poiInfo"+item.name+" "+item.address+" "+item.location.toString());
             }
         });
@@ -245,6 +239,14 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
         mSearchResultList.setAdapter(adapter);
 
         mSearchEditView = (SearchEditView) findViewById(R.id.search_location);
+        mSearchEditView.setOnFinishComposingListener(new SearchEditView.OnFinishComposingListener() {
+            @Override
+            public void finishComposing() {
+                showMapView();
+                mSearchEditView.clearFocus();
+                Log.d(TAG, "finishComposing: ");
+            }
+        });
         mSearchEditView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -258,7 +260,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length() == 0 || "".equals(s.toString())) {
+                if (s.length() == 0 || "".equals(s.toString())|| TextUtils.isEmpty(city)) {
                     mSearchPoisList.setVisibility(View.GONE);
                 } else {
                     //创建PoiSearch实例

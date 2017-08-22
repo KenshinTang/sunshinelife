@@ -7,34 +7,22 @@ import android.support.v7.widget.AppCompatEditText;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.InputConnectionWrapper;
 
 /**
  * author:  Allen <br>
  * date:  2017/8/20 07:49<br>
  * description:
  */
-public class SearchEditView extends AppCompatEditText implements View.OnFocusChangeListener, View.OnKeyListener {
-    private static final String TAG = SearchEditView.class.getSimpleName();
+public class SearchEditView extends AppCompatEditText implements View.OnFocusChangeListener{
+    private static final String TAG = "allen";
     /**
      * 是否是默认图标再左边的样式
      */
     private boolean isLeft = false;
-    /**
-     * 是否点击软键盘搜索
-     */
-    private boolean pressSearch = false;
-    /**
-     * 软键盘搜索键监听
-     */
-    private OnSearchClickListener listener;
-
-    public void setOnSearchClickListener(OnSearchClickListener listener) {
-        this.listener = listener;
-    }
-
     public SearchEditView(Context context) {
         this(context, null);
         init();
@@ -52,7 +40,6 @@ public class SearchEditView extends AppCompatEditText implements View.OnFocusCha
 
     private void init() {
         setOnFocusChangeListener(this);
-        setOnKeyListener(this);
     }
 
     @Override
@@ -77,29 +64,39 @@ public class SearchEditView extends AppCompatEditText implements View.OnFocusCha
 
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-        Log.d(TAG, "onFocusChange execute");
-        // 恢复EditText默认的样式
-        if (!pressSearch && TextUtils.isEmpty(getText().toString())) {
+        Log.d(TAG, "onFocusChange execute"+hasFocus);
+        if (TextUtils.isEmpty(getText().toString())) {
             isLeft = hasFocus;
         }
     }
 
+    private OnFinishComposingListener mFinishComposingListener;
+
+    public void setOnFinishComposingListener(OnFinishComposingListener listener) {
+        this.mFinishComposingListener = listener;
+    }
+
     @Override
-    public boolean onKey(View v, int keyCode, KeyEvent event) {
-        pressSearch = (keyCode == KeyEvent.KEYCODE_ENTER);
-        if (pressSearch && listener != null) {
-            /*隐藏软键盘*/
-            InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (imm.isActive()) {
-                imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
-            }
-            listener.onSearchClick(v);
+    public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+        return new MyInputConnection(super.onCreateInputConnection(outAttrs), false);
+    }
+
+    public class MyInputConnection extends InputConnectionWrapper {
+        public MyInputConnection(InputConnection target, boolean mutable) {
+            super(target, mutable);
         }
-        return false;
+
+        @Override
+        public boolean finishComposingText() {
+            boolean finishComposing = super.finishComposingText();
+            if (mFinishComposingListener != null) {
+                mFinishComposingListener.finishComposing();
+            }
+            return finishComposing;
+        }
     }
 
-    public interface OnSearchClickListener {
-        void onSearchClick(View view);
+    public interface OnFinishComposingListener {
+        public void finishComposing();
     }
-
 }
