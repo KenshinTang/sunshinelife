@@ -137,7 +137,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
     @Override
     public void onMapStatusChangeFinish(MapStatus mapStatus) {
         Log.d("allen","onMapStatusChangeFinish");
-        searchMoveFinish(mapStatus);
+        searchMoveFinish(mapStatus.target);
     }
 
 
@@ -231,7 +231,8 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                 showMapView();
                 PoiInfo item = (PoiInfo)mSearchPoisList.getAdapter().getItem(position);
                 MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(item.location);
-                mBaiduMap.animateMapStatus(u);
+                mBaiduMap.setMapStatus(u);
+                searchMoveFinish(item.location);
                 Log.d(TAG, "onItemClick: poiInfo"+item.name+" "+item.address+" "+item.location.toString());
             }
         });
@@ -343,6 +344,9 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                 // 点击EditText的事件，忽略它。
                 return false;
             } else {
+                if (mSearchPoisList.getVisibility() == View.VISIBLE) {
+                    return false;
+                }
                 v.clearFocus();
                 return true;
             }
@@ -458,16 +462,16 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
             mPoiSearch.setOnGetPoiSearchResultListener(MapLocation.this);
             //设置地图中心点位置
             MapStatus status = new MapStatus.Builder().target(locationLatLng).build();
-            searchMoveFinish(status);
+            searchMoveFinish(status.target);
             MapStatusUpdate u = MapStatusUpdateFactory.newLatLngZoom(locationLatLng, 17.0f);
             mBaiduMap.animateMapStatus(u);
         }
     }
 
-    private void searchMoveFinish(MapStatus status) {
+    private void searchMoveFinish(LatLng target) {
         GeoCoder geoCoder = GeoCoder.newInstance();
         ReverseGeoCodeOption reverseCoder = new ReverseGeoCodeOption();
-        reverseCoder.location(status.target);
+        reverseCoder.location(target);
         Log.d(TAG, "searchMoveFinish: ");
         geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
 
