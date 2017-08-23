@@ -57,6 +57,8 @@ import com.baidu.mapapi.search.poi.PoiDetailResult;
 import com.baidu.mapapi.search.poi.PoiIndoorResult;
 import com.baidu.mapapi.search.poi.PoiResult;
 import com.baidu.mapapi.search.poi.PoiSearch;
+import com.google.gson.Gson;
+import com.plugin.myPlugin.bean.LocationBean;
 import com.yunlinker.ygsh.util.ToastUtil;
 import com.yunlinker.ygsh.view.SearchEditView;
 
@@ -392,9 +394,18 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                     return;
                 }
                 PoiInfo poiInfo = (PoiInfo) item;
-                // TODO: 2017/8/23 测试
+                LocationBean locationBean = new LocationBean();
+                locationBean.setCode(0);
+                locationBean.setMsg("定位成功");
+                locationBean.setLat(poiInfo.location.latitude);
+                locationBean.setLng(poiInfo.location.longitude);
+                locationBean.setRadius(-1);
+                locationBean.setCity(poiInfo.city);
+                locationBean.setAddr(poiInfo.address);
                 Intent intent = new Intent();
-                intent.putExtra("address","地址是");
+                Gson gson = new Gson();
+                String jsonStr  = gson.toJson(locationBean);
+                intent.putExtra("data", jsonStr);
                 setResult(1,intent);
                 finish();
             }
