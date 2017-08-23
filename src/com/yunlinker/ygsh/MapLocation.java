@@ -80,6 +80,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
 
     private TextView mSendButton;
     private Button mRequestLocation;
+    private TextView mCancel;
     private ListView mSearchResultList;
 
     // 搜索周边相关
@@ -223,6 +224,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
         mMapView = (MapView) findViewById(R.id.bmapView);
         mSendButton = (TextView) findViewById(R.id.send_btn);
         mRequestLocation = (Button) findViewById(R.id.request);
+        mCancel = (TextView) findViewById(R.id.cancel_btn);
         mSearchResultList = (ListView) findViewById(R.id.lv_location_nearby);
         mSearchPoisList = (ListView) findViewById(R.id.search_pois_list);
         mSearchPoisList.setOnItemClickListener(new OnItemClickListener() {
@@ -375,6 +377,12 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                 PoiInfo ad = (PoiInfo) adapter.getItem(position);
                 MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(ad.location);
                 mBaiduMap.setMapStatus(u);
+            }
+        });
+        mCancel.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
 
