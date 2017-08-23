@@ -6,6 +6,7 @@ import com.yunlinker.ygsh.MediaPlayerActivity;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.CordovaPlugin;
 import org.json.JSONObject;
 
 /**
@@ -15,7 +16,7 @@ import org.json.JSONObject;
 public class TestAction implements IPluginAction {
 
     @Override
-    public void doAction(CordovaInterface cordova, JSONObject jsonObject, CallbackContext callbackContext) {
+    public void doAction(CordovaPlugin plugin, CordovaInterface cordova, JSONObject jsonObject, CallbackContext callbackContext) {
         Intent intent = new Intent(cordova.getActivity(), MediaPlayerActivity.class);
         cordova.getActivity().startActivity(intent);
     }

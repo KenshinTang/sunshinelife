@@ -38,7 +38,5 @@ public class MainActivity extends CordovaActivity
 
         // Set by <content src="index.html" /> in config.xml
         loadUrl(launchUrl);
-        startActivity(new Intent(this, MapLocation.class));
-        finish();
     }
 }

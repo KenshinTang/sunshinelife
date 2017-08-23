@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.CordovaPlugin;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,7 +27,7 @@ public class LoginAction implements IPluginAction {
     public static final int LOGINTYPE_QQ = 2;
 
     @Override
-    public void doAction(CordovaInterface cordova, JSONObject jsonObject, CallbackContext callbackContext) {
+    public void doAction(CordovaPlugin plugin, CordovaInterface cordova, JSONObject jsonObject, CallbackContext callbackContext) {
         int loginType = jsonObject.optInt("type");
         Log.i(TAG, "login type[1:wechat, 2:QQ] = " + loginType);
         loginType = LOGINTYPE_QQ;

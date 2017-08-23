@@ -2,6 +2,7 @@ package com.plugin.myPlugin.factory;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.CordovaPlugin;
 import org.json.JSONObject;
 
 /**
@@ -11,7 +12,7 @@ import org.json.JSONObject;
 public class UploadImgAction implements IPluginAction {
 
     @Override
-    public void doAction(CordovaInterface cordova, JSONObject jsonObject, CallbackContext callbackContext) {
+    public void doAction(CordovaPlugin plugin, CordovaInterface cordova, JSONObject jsonObject, CallbackContext callbackContext) {
 
     }
 }

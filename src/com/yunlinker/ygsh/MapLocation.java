@@ -386,9 +386,17 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
 
             @Override
             public void onClick(View v) {
-                PoiInfo poiInfo = (PoiInfo) adapter.getItem(checkPosition);
-                ToastUtil.show(getApplicationContext(), "名称是: " + poiInfo.name + " 地址是：" + poiInfo.address
-                        + "纬度是: " + poiInfo.location.latitude + "经度是: " + poiInfo.location.longitude);
+                Object item = adapter.getItem(checkPosition);
+                if (item == null) {
+                    setResult(0);
+                    return;
+                }
+                PoiInfo poiInfo = (PoiInfo) item;
+                // TODO: 2017/8/23 测试
+                Intent intent = new Intent();
+                intent.putExtra("address","地址是");
+                setResult(1,intent);
+                finish();
             }
         });
 
