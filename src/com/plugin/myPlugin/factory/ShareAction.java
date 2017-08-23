@@ -4,6 +4,7 @@ import android.util.Log;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.CordovaPlugin;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class ShareAction implements IPluginAction {
     // "desc":"ceshidesc",
     // "url":"https:\/\/www.baidu.com\/"}]
     @Override
-    public void doAction(CordovaInterface cordova, JSONObject jsonObject, final CallbackContext callbackContext) {
+    public void doAction(CordovaPlugin plugin, CordovaInterface cordova, JSONObject jsonObject, final CallbackContext callbackContext) {
         String title = jsonObject.optString("title");
         String imagePath = jsonObject.optString("pic");
         String desc = jsonObject.optString("desc");

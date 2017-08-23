@@ -19,6 +19,7 @@
 
 package com.yunlinker.ygsh;
 
+import android.content.Intent;
 import android.os.Bundle;
 import org.apache.cordova.*;
 
