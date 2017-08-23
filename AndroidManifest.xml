@@ -41,7 +41,7 @@
         android:supportsRtl="true">
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="SqyjfWdyTSZ4sbf7nQ8kgfVEpx6x5aI5" />
+            android:value="os3nZMXz1MURRPjx53ux6bHFsBfyuIgN" />
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"

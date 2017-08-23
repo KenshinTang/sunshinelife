@@ -52,7 +52,6 @@
         android:id="@+id/search_pois_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#ffcccccc"
         android:divider="#d9d8d8"
         android:dividerHeight="1dp"
         android:cacheColorHint="@android:color/transparent"
