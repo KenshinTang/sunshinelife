@@ -409,7 +409,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                 locationBean.setMsg("定位成功");
                 locationBean.setLat(poiInfo.location.latitude);
                 locationBean.setLng(poiInfo.location.longitude);
-                locationBean.setRadius(-1);
+                locationBean.setRadius((int) radius);
                 locationBean.setCity(poiInfo.city);
                 locationBean.setAddr(poiInfo.address);
                 Intent intent = new Intent();
@@ -475,7 +475,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
             LatLng locationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
             // 构造定位数据
             MyLocationData locData = new MyLocationData.Builder()
-                    .accuracy(location.getRadius())
+                    .accuracy(radius)
                     // 此处设置开发者获取到的方向信息，顺时针0-360
                     .direction(100).latitude(location.getLatitude())
                     .longitude(location.getLongitude()).build();
