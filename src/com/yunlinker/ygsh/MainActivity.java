@@ -21,6 +21,10 @@ package com.yunlinker.ygsh;
 
 import android.content.Intent;
 import android.os.Bundle;
+
+
+import com.umeng.socialize.UMShareAPI;
+
 import org.apache.cordova.*;
 
 public class MainActivity extends CordovaActivity
@@ -38,5 +42,11 @@ public class MainActivity extends CordovaActivity
 
         // Set by <content src="index.html" /> in config.xml
         loadUrl(launchUrl);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UMShareAPI.get(this).onActivityResult(requestCode,resultCode,data);//完成回调
     }
 }

@@ -33,15 +33,23 @@
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
     <application
         android:hardwareAccelerated="true"
         android:icon="@mipmap/icon"
         android:label="@string/app_name"
         android:name="com.yunlinker.ygsh.YunApplication"
         android:supportsRtl="true">
+
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="os3nZMXz1MURRPjx53ux6bHFsBfyuIgN" />
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="599d871245297d4ece0018c2" />
+
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
@@ -61,6 +69,26 @@
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
             android:screenOrientation="landscape">
         </activity>
+
+        <activity
+            android:name="com.umeng.qq.tencent.AuthActivity"
+            android:launchMode="singleTask"
+            android:noHistory="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="tencent1105543710" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.umeng.qq.tencent.AssistActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <!-- ShareSDK的activity -->
         <activity
@@ -84,6 +112,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".MapLocation"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar"

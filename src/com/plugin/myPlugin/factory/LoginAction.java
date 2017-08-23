@@ -1,7 +1,10 @@
 package com.plugin.myPlugin.factory;
 
+import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.umeng.socialize.UMShareAPI;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
