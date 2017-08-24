@@ -4,6 +4,7 @@
 服务器远程链接密码：366979
 systemctl stop firewalld.service
 https://dev.aliyun.com/search.html
+http://ygsh.oss-cn-shenzhen.aliyuncs.com/
 
 服务器管理员账号：root
 密码：He2006zhe220
