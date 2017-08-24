@@ -1,0 +1,67 @@
+密钥库类型: JKS
+密钥库提供方: SUN
+
+您的密钥库包含 2 个条目
+
+别名: yunlinker
+创建日期: 2017-8-21
+条目类型: PrivateKeyEntry
+证书链长度: 1
+证书[1]:
+所有者: CN=yunlinker, OU=yunlinker, O=yunlinker, L=yunlinker, ST=yunlinker, C=yunlinker
+发布者: CN=yunlinker, OU=yunlinker, O=yunlinker, L=yunlinker, ST=yunlinker, C=yunlinker
+序列号: 458ac223
+有效期开始日期: Mon Aug 21 22:20:59 CST 2017, 截止日期: Fri Aug 15 22:20:59 CST 2042
+证书指纹:
+	 MD5: AE:71:EC:76:70:17:6D:C4:78:A8:6D:AF:DE:F4:84:62
+	 SHA1: A3:0A:37:32:73:DA:E8:16:E7:EE:BC:D7:9D:35:0C:A7:08:E5:72:63
+	 SHA256: 4E:4A:A8:0A:AD:EA:52:37:98:7F:DE:24:3A:10:27:A6:A5:43:3B:F4:D1:BA:75:53:BA:42:18:15:25:2A:A1:D2
+	 签名算法名称: SHA256withRSA
+	 版本: 3
+
+扩展:
+
+#1: ObjectId: 2.5.29.14 Criticality=false
+SubjectKeyIdentifier [
+KeyIdentifier [
+0000: AC 7D 55 BC DB 08 8A 3F   20 D4 3C A1 F8 48 9E A2  ..U....? .<..H..
+0010: 74 A4 5D 32                                        t.]2
+]
+]
+
+
+
+*******************************************
+*******************************************
+不使用
+
+别名: key0
+创建日期: 2017-8-21
+条目类型: PrivateKeyEntry
+证书链长度: 1
+证书[1]:
+所有者: CN=yunlinker
+发布者: CN=yunlinker
+序列号: 3797c607
+有效期开始日期: Mon Aug 21 22:21:41 CST 2017, 截止日期: Fri Aug 15 22:21:41 CST 2042
+证书指纹:
+	 MD5: A9:3E:9C:E5:A7:21:81:5E:DE:51:4F:B7:BE:D3:E7:04
+	 SHA1: A3:61:08:3F:B1:C8:13:43:DC:A6:43:79:6D:05:43:B1:D6:95:6E:32
+	 SHA256: 76:38:EB:D3:D8:8F:81:96:A9:C4:00:08:0B:C1:6A:54:C1:DA:14:AB:8D:91:E9:7C:EB:DB:5E:94:8C:F7:5B:E5
+	 签名算法名称: SHA256withRSA
+	 版本: 3
+
+扩展:
+
+#1: ObjectId: 2.5.29.14 Criticality=false
+SubjectKeyIdentifier [
+KeyIdentifier [
+0000: 59 4B 6F 73 78 E3 7C FD   3C 20 AD 06 4E 26 F8 0A  YKosx...< ..N&..
+0010: 92 6E D9 D7                                        .n..
+]
+]
+
+
+
+*******************************************
+*******************************************

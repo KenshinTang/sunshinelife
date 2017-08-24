@@ -80,6 +80,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
 
     private TextView mSendButton;
     private Button mRequestLocation;
+    private TextView mCancel;
     private ListView mSearchResultList;
 
     // 搜索周边相关
@@ -223,6 +224,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
         mMapView = (MapView) findViewById(R.id.bmapView);
         mSendButton = (TextView) findViewById(R.id.send_btn);
         mRequestLocation = (Button) findViewById(R.id.request);
+        mCancel = (TextView) findViewById(R.id.cancel_btn);
         mSearchResultList = (ListView) findViewById(R.id.lv_location_nearby);
         mSearchPoisList = (ListView) findViewById(R.id.search_pois_list);
         mSearchPoisList.setOnItemClickListener(new OnItemClickListener() {
@@ -281,6 +283,9 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                         //poi 查询结果回调
                         @Override
                         public void onGetPoiResult(PoiResult poiResult) {
+                            if (poiResult == null) {
+                                return;
+                            }
                             List<PoiInfo> poiInfos = poiResult.getAllPoi();
                             Log.d(TAG, "onGetPoiResult");
                             PoiSearchAdapter poiSearchAdapter = new PoiSearchAdapter(mContext, poiInfos);
@@ -374,12 +379,17 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                 mBaiduMap.setMapStatus(u);
             }
         });
+        mCancel.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         mRequestLocation.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                ToastUtil.show(getApplicationContext(), "正在定位。。。");
                 initLocation();
             }
         });
@@ -399,7 +409,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                 locationBean.setMsg("定位成功");
                 locationBean.setLat(poiInfo.location.latitude);
                 locationBean.setLng(poiInfo.location.longitude);
-                locationBean.setRadius(-1);
+                locationBean.setRadius((int) radius);
                 locationBean.setCity(poiInfo.city);
                 locationBean.setAddr(poiInfo.address);
                 Intent intent = new Intent();
@@ -454,20 +464,18 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                 return;
             }
             int locType = location.getLocType();
-            Log.i(TAG, "当前定位的返回值是：" + locType);
             if (location.hasRadius()) {// 判断是否有定位精度半径
                 radius = location.getRadius();
             }
 
             if (locType == BDLocation.TypeNetWorkLocation) {
                 addrStr = location.getAddrStr();// 获取反地理编码(文字描述的地址)
-                Log.i(TAG, "当前定位的地址是：" + addrStr);
             }
             city = location.getCity();// 城市
             LatLng locationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
             // 构造定位数据
             MyLocationData locData = new MyLocationData.Builder()
-                    .accuracy(location.getRadius())
+                    .accuracy(radius)
                     // 此处设置开发者获取到的方向信息，顺时针0-360
                     .direction(100).latitude(location.getLatitude())
                     .longitude(location.getLongitude()).build();
@@ -585,8 +593,6 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
-            Log.i("allen", "name地址是：" + dataList.get(position).name);
-            Log.i("allen", "address地址是：" + dataList.get(position).address);
 
             holder.textView.setText(dataList.get(position).name);
             holder.textAddress.setText(dataList.get(position).address);
@@ -620,11 +626,17 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
 
         @Override
         public int getCount() {
+            if (poiInfos == null) {
+                return 0;
+            }
             return poiInfos.size();
         }
 
         @Override
         public Object getItem(int position) {
+            if (poiInfos == null) {
+                return null;
+            }
             return poiInfos.get(position);
         }
 

@@ -45,7 +45,8 @@
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="os3nZMXz1MURRPjx53ux6bHFsBfyuIgN" />
+            android:value="SqyjfWdyTSZ4sbf7nQ8kgfVEpx6x5aI5" />
+
         <meta-data
             android:name="UMENG_APPKEY"
             android:value="599d871245297d4ece0018c2" />
