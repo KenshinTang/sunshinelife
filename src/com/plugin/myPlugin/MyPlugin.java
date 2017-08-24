@@ -63,7 +63,11 @@ public class MyPlugin extends CordovaPlugin {
             case 1000:
                 if (resultCode == 1) {
                     String data = intent.getStringExtra("data");
-                    callbackContext.success(data);
+                    try {
+                        JSONObject jo = new JSONObject(data);
+                        callbackContext.success(jo);
+                    } catch (JSONException e) {
+                    }
                 } else {
                     JSONObject jo = new JSONObject();
                     try {

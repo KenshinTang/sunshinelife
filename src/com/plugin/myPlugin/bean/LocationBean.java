@@ -1,18 +1,21 @@
 package com.plugin.myPlugin.bean;
 
+import java.io.Serializable;
+
 /**
  * author:  Allen <br>
  * date:  2017/8/23/023 14:49 <br>
  * description:
  */
 
-public class LocationBean{
+public class LocationBean implements Serializable{
     /**
-     * code : 错误码 1成功，0失败
+     * code : 0
      * msg : 描述
-     * lng : 经度
-     * lat : 经度
-     * radius : 半径
+     * location_name : 地址名
+     * location_adress : 地址
+     * location_lat : 纬度
+     * location_lng : 经度
      * province : 省
      * city : 市
      * county : 区、县
@@ -21,9 +24,10 @@ public class LocationBean{
 
     private int code;
     private String msg;
-    private double lng;
-    private double lat;
-    private int radius;
+    private String location_name;
+    private String location_adress;
+    private double location_lat;
+    private double location_lng;
     private String province;
     private String city;
     private String county;
@@ -45,28 +49,36 @@ public class LocationBean{
         this.msg = msg;
     }
 
-    public double getLng() {
-        return lng;
+    public String getLocation_name() {
+        return location_name;
     }
 
-    public void setLng(double lng) {
-        this.lng = lng;
+    public void setLocation_name(String location_name) {
+        this.location_name = location_name;
     }
 
-    public double getLat() {
-        return lat;
+    public String getLocation_adress() {
+        return location_adress;
     }
 
-    public void setLat(double lat) {
-        this.lat = lat;
+    public void setLocation_adress(String location_adress) {
+        this.location_adress = location_adress;
     }
 
-    public int getRadius() {
-        return radius;
+    public double getLocation_lat() {
+        return location_lat;
     }
 
-    public void setRadius(int radius) {
-        this.radius = radius;
+    public void setLocation_lat(double location_lat) {
+        this.location_lat = location_lat;
+    }
+
+    public double getLocation_lng() {
+        return location_lng;
+    }
+
+    public void setLocation_lng(double location_lng) {
+        this.location_lng = location_lng;
     }
 
     public String getProvince() {
@@ -100,4 +112,5 @@ public class LocationBean{
     public void setAddr(String addr) {
         this.addr = addr;
     }
+
 }

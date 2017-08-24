@@ -407,9 +407,9 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
                 LocationBean locationBean = new LocationBean();
                 locationBean.setCode(0);
                 locationBean.setMsg("定位成功");
-                locationBean.setLat(poiInfo.location.latitude);
-                locationBean.setLng(poiInfo.location.longitude);
-                locationBean.setRadius((int) radius);
+                locationBean.setLocation_adress(poiInfo.address);
+                locationBean.setLocation_lat(poiInfo.location.latitude);
+                locationBean.setLocation_lng(poiInfo.location.longitude);
                 locationBean.setCity(poiInfo.city);
                 locationBean.setAddr(poiInfo.address);
                 Intent intent = new Intent();
