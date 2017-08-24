@@ -8,7 +8,7 @@
 
 	exec(success, error, "MyPlugin", "upImgMethod", [arg0]);
 
-	arg0 = {url:"上传接口”, count: “允许上传图片的数量”, timestamp:”时间戳”, sign:”加密的字符串”} （比如这个格式请求：userid=5&password=6&sign=1111&timestamp=1121212121）
+	arg0 = {url:"上传接口”, count: “允许上传图片的数量”, timestamp:”时间戳”, sign:”加密的字符串”} （比如这个格式请求：sign=1111&timestamp=1121212121）
 
 	回调: （例如：）{code: 成功1，失败0, msg: 描述, imgUrl: [2017-03/12345.jpg,2017-03/12346.jpg]}
 
