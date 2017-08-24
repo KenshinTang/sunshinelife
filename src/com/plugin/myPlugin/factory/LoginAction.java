@@ -50,18 +50,18 @@ public class LoginAction implements IPluginAction {
         switch (loginType) {
             case LOGINTYPE_WECHAT:
 //                MobAuthorize(new Wechat(), callbackContext);
-                UmengAuthorize(cordova.getActivity(), SHARE_MEDIA.QQ, callbackContext);
+                UmengAuthorize(cordova.getActivity(), SHARE_MEDIA.WEIXIN, callbackContext);
                 break;
             case LOGINTYPE_QQ:
 //                MobAuthorize(new QQ(), callbackContext);
-                UmengAuthorize(cordova.getActivity(), SHARE_MEDIA.WEIXIN, callbackContext);
+                UmengAuthorize(cordova.getActivity(), SHARE_MEDIA.QQ, callbackContext);
                 break;
             default:
                 break;
         }
     }
 
-    private void UmengAuthorize(Activity context, SHARE_MEDIA shareMedia, CallbackContext callbackContext) {
+    private void UmengAuthorize(Activity context, SHARE_MEDIA shareMedia, final CallbackContext callbackContext) {
         UMShareAPI umShareAPI = UMShareAPI.get(context);
         umShareAPI.getPlatformInfo(context, shareMedia, new UMAuthListener() {
             @Override
@@ -71,17 +71,53 @@ public class LoginAction implements IPluginAction {
 
             @Override
             public void onComplete(SHARE_MEDIA share_media, int i, Map<String, String> map) {
+                //{unionid=, is_yellow_vip=0, screen_name=剑心, msg=, vip=0, city=成都,
+                // accessToken=4BA5B59D33FCCBE438C948853AF13C81, gender=男, province=四川,
+                // is_yellow_year_vip=0, openid=C9A1CC7DD7352E545EE9BF79A6B549E0,
+                // profile_image_url=http://q.qlogo.cn/qqapp/1105543710/C9A1CC7DD7352E545EE9BF79A6B549E0/100,
+                // yellow_vip_level=0, access_token=4BA5B59D33FCCBE438C948853AF13C81,
+                // iconurl=http://q.qlogo.cn/qqapp/1105543710/C9A1CC7DD7352E545EE9BF79A6B549E0/100,
+                // name=剑心, uid=C9A1CC7DD7352E545EE9BF79A6B549E0,
+                // expiration=1511362939428, expires_in=1511362939428, level=0, ret=0}
                 Log.i(TAG, share_media + "授权成功:" + map);
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("code", 1);
+                    jsonObject.put("unionid", map.get("uid"));
+                    jsonObject.put("face", map.get("iconurl"));
+                    jsonObject.put("nikename", map.get("name"));
+                    jsonObject.put("sex", map.get("gender"));
+                    jsonObject.put("city", map.get("city"));
+                    callbackContext.success(jsonObject);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void onError(SHARE_MEDIA share_media, int i, Throwable throwable) {
-
+                try{
+                    Log.w(TAG, share_media + "授权失败", throwable);
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("code", 0);
+                    jsonObject.put("msg", "授权失败");
+                    callbackContext.error(jsonObject);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void onCancel(SHARE_MEDIA share_media, int i) {
-
+                try{
+                    Log.w(TAG, share_media + "授权取消");
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("code", 0);
+                    jsonObject.put("msg", "授权取消");
+                    callbackContext.error(jsonObject);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         });
     }
