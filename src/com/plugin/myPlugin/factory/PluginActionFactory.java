@@ -29,6 +29,9 @@ public class PluginActionFactory {
             case "coolMethod":  //test
                 pluginAction = new TestAction();
                 break;
+            case "getLatLngMethod"://获取经纬度
+                pluginAction = new GetLocationAction();
+                break;
         }
 
         return pluginAction;
