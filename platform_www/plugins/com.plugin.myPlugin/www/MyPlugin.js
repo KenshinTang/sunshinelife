@@ -29,4 +29,8 @@ exports.getPushTokenMethod = function(arg0, success, error) {
   exec(success, error, "MyPlugin", "getPushTokenMethod", [arg0]);
 };
 
+exports.getLatLngMethod = function(arg0, success, error) {
+  exec(success, error, "MyPlugin", "getLatLngMethod", [arg0]);
+};
+
 });

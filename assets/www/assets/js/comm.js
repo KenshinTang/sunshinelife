@@ -3,7 +3,7 @@ var Config={
 	root:'http://39.108.54.14:8080/ygsh/',//接口根路径url
 	ossroot:'http://ygsh.oss-cn-shenzhen.aliyuncs.com/',//oss根路径
   pagesize:10,
-  isApp: false
+  isApp: true
 };
 
 var AJAX={
@@ -515,7 +515,7 @@ function area2(areaPicker, argustemp, cb) {
   });
 }
 
-function showPicker(ee, areaPicker, argustemp) {
+function showPicker(ee, areaPicker, argustemp, id) {
   var e = ee.target;
   console.log(e);
   if(areaPicker){
@@ -523,7 +523,7 @@ function showPicker(ee, areaPicker, argustemp) {
       var aid = null;
       for(var i=0;i<v.length;i++){if(v[i].value)aid=v[i].value;}
       var at = (v.length>0&&v[0].text?v[0].text+' ':'') + (v.length>1&&v[1].text?v[1].text+' ':'') + (v.length>2&&v[2].text?v[2].text+' ':'');
-      $(".input").val(at).attr("data", aid).css('color', '#001111');
+      $("#" + id).val(at).attr("data", aid).css('color', '#001111');
     })
   } else {
     argustemp=arguments;
