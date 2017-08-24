@@ -8,9 +8,9 @@
 
 	exec(success, error, "MyPlugin", "upImgMethod", [arg0]);
 
-	arg0 = {url:"上传接口"}
+	arg0 = {url:"上传接口”, count: “允许上传图片的数量”, timestamp:”时间戳”, sign:”加密的字符串”} （比如这个格式请求：userid=5&password=6&sign=1111&timestamp=1121212121）
 
-	回调: （例如：）{code: 成功1，失败0, msg: 描述, imgUrl: “2017-03/12345.jpg,2017-03/12346.jpg"}
+	回调: （例如：）{code: 成功1，失败0, msg: 描述, imgUrl: [2017-03/12345.jpg,2017-03/12346.jpg]}
 
 2.定位(Android需集成第三方,ios系统自带)【回调返回】
 	exec(success, error, "MyPlugin", "positionMethod", [arg0]);
@@ -19,9 +19,10 @@
 
 	回调: {		code: 成功1，失败0,
 			msg: 描述,
-			lng:经度
-			lat:经度
-			radius:半径（没有为-1）
+			location_name:地址上方的名字
+			location_adress:地址下方的名字
+			location_lat: 纬度
+			location_lng: 经度
 			province:省（如果能取到）
 			city：市（如果能取到）
 			county：区、县（如果能取到）
@@ -61,9 +62,15 @@
 
 	回调 : {"code":1成功,0失败，"msg":"描述”,”type","友盟、极光 推送名字，如果未获取或者没有推送端则为空","token":"设置token"}
 
+7.获取经纬度【回调返回】
+	exec(success, error, "MyPlugin", "getLatLngMethod", [arg0]);
+
+	arg0 : null
+
+	回调 : {"code":1成功,0失败，"msg":"描述”,“lat”:”纬度” , “lng”: “经度”}
 
 
-7.设置推送【回调返回】(暂定)
+8.设置推送【回调返回】(暂定)
 	native_fns("setPush", jsonObj, t);
 	jsonObj : {act:"get,set",value:1,2}
 
