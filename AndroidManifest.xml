@@ -124,7 +124,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".MapLocationActivity"
+            android:name=".MapLocation"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
             android:screenOrientation="portrait">
         </activity>
