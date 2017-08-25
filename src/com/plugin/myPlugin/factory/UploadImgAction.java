@@ -8,6 +8,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -20,7 +23,6 @@ import android.view.WindowManager;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.yunlinker.ygsh.R;
 
 import org.apache.cordova.CallbackContext;
@@ -42,6 +44,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Created by YX on 2017/8/20.
@@ -60,13 +64,14 @@ public class UploadImgAction extends IPluginAction {
     private PopupWindow mPopupWindow;
     private CordovaPlugin mPlugin;
     private Bitmap mHead;
-    private String path = "/sdcard/myHead/";
-    private String name = "sunshinelife.jpg";
+    private String mPath = "/sdcard/myHead/";
+    private String mFilename = "sunshinelife.jpg";
     public static final String SUCCESS = "success";
     public static final String FAILURE = "failed";
     private static final int TIME_OUT = 5 * 60 * 1000; //超时时间
     private static final String CHARSET = "utf-8"; //设置编码
     private JSONObject mJSONObject;
+
     @Override
     public void doAction(final CordovaPlugin plugin, JSONObject jsonObject, CallbackContext callbackContext) {
         LayoutInflater inflater = LayoutInflater.from(plugin.cordova.getActivity());
@@ -121,7 +126,7 @@ public class UploadImgAction extends IPluginAction {
             case TAKE_TYPE:
                 if (resultCode == -1) {
                     File temp = new File(Environment.getExternalStorageDirectory()
-                            + "/sunshinelife.jpg");
+                            + "/"+mFilename);
                     cropPhoto(Uri.fromFile(temp));//裁剪图片
                 }
                 break;
@@ -142,7 +147,7 @@ public class UploadImgAction extends IPluginAction {
                         } else {
                             setPicToView(head);//保存在SD卡中
                         }
-                        uploadPrint(path+name);
+                        uploadPic(mPath + mFilename);
                     }
                 }
                 break;
@@ -152,21 +157,21 @@ public class UploadImgAction extends IPluginAction {
     /**
      * 上传头像
      */
-    private void uploadPrint(String filePath) {
+    private void uploadPic(String filePath) {
         final File file = new File(filePath);
         try {
             final String url = mJSONObject.getString("url");
             String timestamp = mJSONObject.getString("timestamp");
             String sign = mJSONObject.getString("sign");
-            final HashMap<String,String> params = new HashMap<String, String>();
-            params.put("timestamp",timestamp);
-            params.put("sign",sign);
-            new Thread(new Runnable() {
+            final HashMap<String, String> params = new HashMap<>();
+            params.put("timestamp", timestamp);
+            params.put("sign", sign);
+            Executors.newCachedThreadPool().execute(new Runnable() {
                 @Override
                 public void run() {
-                    uploadFile(file,getUrl(url, params));
+                    uploadFile(file, getUrl(url, params));
                 }
-            }).start();
+            });
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -210,7 +215,7 @@ public class UploadImgAction extends IPluginAction {
                  * name里面的值为服务器端需要key 只有这个key 才可以得到对应的文件
                  * filename是文件的名字，包含后缀名的 比如:abc.png
                  */
-                dos.write((PREFIX + BOUNDARY + LINE_END + "Content-Disposition: form-data; name=\"img\"; filename=\"" + file.getName() + "\"" + LINE_END + "Content-Type: application/octet-stream; charset=" + CHARSET + LINE_END + LINE_END).getBytes());
+                dos.write((PREFIX + BOUNDARY + LINE_END + "Content-Disposition: form-data; mFilename=\"img\"; filename=\"" + file.getName() + "\"" + LINE_END + "Content-Type: application/octet-stream; charset=" + CHARSET + LINE_END + LINE_END).getBytes());
                 InputStream is = new FileInputStream(file);
                 byte[] bytes = new byte[1024];
                 int len = 0;
@@ -227,7 +232,7 @@ public class UploadImgAction extends IPluginAction {
                  * 当响应成功，获取响应的流
                  */
                 int res = conn.getResponseCode();
-                Log.i("allen", "response code:" + res+"message"+conn.getResponseMessage());
+                Log.i("allen", "response code:" + res + "message" + conn.getResponseMessage());
                 if (res == 200) {
                     return SUCCESS;
                 }
@@ -242,21 +247,21 @@ public class UploadImgAction extends IPluginAction {
 
     @Override
     public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
-        switch (requestCode){
-            case MY_PERMISSIONS_REQUEST_CAMERA_CODE:{
-                if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_CAMERA_CODE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //权限申请成功
                     takePhoto();
-                }else{
+                } else {
                     //权限申请失败
                 }
             }
             break;
-            case MY_PERMISSIONS_REQUEST_STORAGE_CODE:{
-                if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            case MY_PERMISSIONS_REQUEST_STORAGE_CODE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //权限申请成功
                     setPicToView(mHead);//保存在SD卡中
-                }else{
+                } else {
                     //权限申请失败
                 }
             }
@@ -270,7 +275,7 @@ public class UploadImgAction extends IPluginAction {
         mPopupWindow.dismiss();
         Intent takeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         takeIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
-                "sunshinelife.jpg")));
+                mFilename)));
         mPlugin.cordova.startActivityForResult(mPlugin, takeIntent, TAKE_TYPE);
     }
 
@@ -310,9 +315,9 @@ public class UploadImgAction extends IPluginAction {
             return;
         }
         FileOutputStream b = null;
-        File file = new File(path);
+        File file = new File(mPath);
         file.mkdirs();// 创建文件夹
-        String fileName = path + name;//图片名字
+        String fileName = mPath + mFilename;//图片名字
         try {
             b = new FileOutputStream(fileName);
             mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);// 把数据写入文件
@@ -331,11 +336,12 @@ public class UploadImgAction extends IPluginAction {
 
     /**
      * 拼接URL
+     *
      * @param baseUrl 接口请求地址
-     * @param params 请求参数
+     * @param params  请求参数
      * @return 拼接的url
      */
-    private static String getUrl(String baseUrl ,HashMap<String, String> params) {
+    private static String getUrl(String baseUrl, HashMap<String, String> params) {
         String url = baseUrl;
         // 添加url参数
         if (params != null) {
