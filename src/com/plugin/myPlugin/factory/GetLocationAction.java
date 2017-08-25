@@ -1,15 +1,12 @@
 package com.plugin.myPlugin.factory;
 
-import android.content.Intent;
 import android.util.Log;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
-import com.yunlinker.ygsh.MapLocation;
 
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,14 +15,14 @@ import org.json.JSONObject;
  * Created by YX on 2017/8/20.
  */
 
-public class GetLocationAction implements IPluginAction {
+public class GetLocationAction extends IPluginAction {
 
     private LocationClient mLocationClient;
 
-//    {"code":1成功,0失败，"msg":"描述”,“lat”:”纬度” , “lng”: “经度”}
+    //    {"code":1成功,0失败，"msg":"描述”,“lat”:”纬度” , “lng”: “经度”}
     @Override
-    public void doAction(CordovaPlugin plugin, final CordovaInterface cordova, JSONObject jsonObject, final CallbackContext callbackContext) {
-        mLocationClient = new LocationClient(cordova.getActivity());
+    public void doAction(CordovaPlugin plugin, JSONObject jsonObject, final CallbackContext callbackContext) {
+        mLocationClient = new LocationClient(plugin.cordova.getActivity());
         // 注册监听函数
         mLocationClient.registerLocationListener(new BDLocationListener() {
             //1.接收异步返回的定位结果，参数是BDLocation类型参数。
@@ -33,7 +30,7 @@ public class GetLocationAction implements IPluginAction {
             public void onReceiveLocation(BDLocation bdLocation) {
                 String lat = String.valueOf(bdLocation.getLatitude());
                 String lng = String.valueOf(bdLocation.getLongitude());
-                if(lat.equals("") || lng.equals("")){
+                if (lat.equals("") || lng.equals("")) {
                     //定位失败
                     try {
                         JSONObject object = new JSONObject();
@@ -42,9 +39,9 @@ public class GetLocationAction implements IPluginAction {
                         callbackContext.error(object);
                     } catch (JSONException e) {
                     }
-                }else{
+                } else {
                     //定位成功
-                    Log.d("allen", "onReceiveLocation: "+"经度："+lat+"纬度："+lng);
+                    Log.d("allen", "onReceiveLocation: " + "经度：" + lat + "纬度：" + lng);
                     try {
                         JSONObject object = new JSONObject();
                         object.put("code", 1);
@@ -52,7 +49,7 @@ public class GetLocationAction implements IPluginAction {
                         object.put("lat", lat);
                         object.put("lng", lng);
                         callbackContext.success(object);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                     }
                 }
             }

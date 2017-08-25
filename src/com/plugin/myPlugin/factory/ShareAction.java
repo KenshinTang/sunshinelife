@@ -25,7 +25,7 @@ import cn.sharesdk.onekeyshare.OnekeyShare;
  * Created by YX on 2017/8/20.
  */
 
-public class ShareAction implements IPluginAction {
+public class ShareAction extends IPluginAction {
     private static final String TAG = "ShareAction";
 
     // [{"pic":"https:\/\/m.baidu.com\/static\/index\/plus\/plus_logo.png",
@@ -33,7 +33,7 @@ public class ShareAction implements IPluginAction {
     // "desc":"ceshidesc",
     // "url":"https:\/\/www.baidu.com\/"}]
     @Override
-    public void doAction(CordovaPlugin plugin, CordovaInterface cordova, JSONObject jsonObject, final CallbackContext callbackContext) {
+    public void doAction(CordovaPlugin plugin, JSONObject jsonObject, final CallbackContext callbackContext) {
         String title = jsonObject.optString("title");
         String imagePath = jsonObject.optString("pic");
         String desc = jsonObject.optString("desc");
@@ -42,7 +42,7 @@ public class ShareAction implements IPluginAction {
         Log.i(TAG, "show Share [title:" + title + ", imagePath:" + imagePath + ", desc:" + desc + ", url:" + url + "]");
 
         //友盟分享
-        showUmengShare(cordova, title, url, desc, imagePath, callbackContext);
+        showUmengShare(plugin.cordova, title, url, desc, imagePath, callbackContext);
 
         //Mob分享
 //        showOnekeyShare(cordova, title, url, desc, imagePath, callbackContext);

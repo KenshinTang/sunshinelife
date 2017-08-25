@@ -3,38 +3,24 @@ package com.plugin.myPlugin;
 import android.content.Intent;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.plugin.myPlugin.bean.LocationBean;
 import com.plugin.myPlugin.factory.IPluginAction;
 import com.plugin.myPlugin.factory.PluginActionFactory;
 
-import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
-
+import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import cn.sharesdk.framework.Platform;
-import cn.sharesdk.framework.PlatformActionListener;
-import cn.sharesdk.onekeyshare.OnekeyShare;
-import com.yunlinker.ygsh.MediaPlayerActivity;
-
-import java.io.Serializable;
-import java.util.HashMap;
-
-import static android.R.attr.data;
 
 /**
  * This class echoes a string called from JavaScript.
  */
 public class MyPlugin extends CordovaPlugin {
     private static final String TAG = "MyPlugin";
-    private CallbackContext callbackContext;
+    IPluginAction mPluginAction;
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        this.callbackContext = callbackContext;
         if (args.length() <= 0) {
             return false;
         }
@@ -46,39 +32,39 @@ public class MyPlugin extends CordovaPlugin {
             e.printStackTrace();
         }
 
-        IPluginAction pluginAction = PluginActionFactory.createPluginAction(action);
-        if (pluginAction == null) {
+        mPluginAction = PluginActionFactory.createPluginAction(action);
+        if (mPluginAction == null) {
             return false;
         }
-        pluginAction.doAction(this,cordova, jsonObject, callbackContext);
-
+        mPluginAction.doAction(this, jsonObject, callbackContext);
         return true;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-        Log.d(TAG, "onActivityResult: "+requestCode+"resultCode"+resultCode);
-        switch (requestCode) {
-            case 1000:
-                if (resultCode == 1) {
-                    String data = intent.getStringExtra("data");
-                    try {
-                        JSONObject jo = new JSONObject(data);
-                        callbackContext.success(jo);
-                    } catch (JSONException e) {
-                    }
-                } else {
-                    JSONObject jo = new JSONObject();
-                    try {
-                        jo.put("code", "0");
-                        jo.put("msg", "定位失败");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    callbackContext.error(jo);
-                }
-                break;
+        Log.d(TAG, "onActivityResult: " + requestCode + "resultCode" + resultCode);
+        if (mPluginAction != null) {
+            mPluginAction.onActivityResult(requestCode, resultCode, intent);
         }
+        super.onActivityResult(requestCode, resultCode, intent);
+
     }
+
+    /**
+     * 处理运行时权限回调
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     * @throws JSONException
+     */
+    @Override
+    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
+        if (mPluginAction != null) {
+            mPluginAction.onRequestPermissionResult(requestCode, permissions, grantResults);
+        }
+        super.onRequestPermissionResult(requestCode, permissions, grantResults);
+    }
+
+
 }

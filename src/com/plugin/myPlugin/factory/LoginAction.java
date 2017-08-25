@@ -1,8 +1,6 @@
 package com.plugin.myPlugin.factory;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -11,9 +9,7 @@ import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -35,14 +31,13 @@ import cn.sharesdk.wechat.friends.Wechat;
  city:城市（如果没有就为空）}
  */
 
-public class LoginAction implements IPluginAction {
-    private static final String TAG = "LoginAction";
-
+public class LoginAction extends IPluginAction {
     public static final int LOGINTYPE_WECHAT = 1;
     public static final int LOGINTYPE_QQ = 2;
+    private static final String TAG = "LoginAction";
 
     @Override
-    public void doAction(CordovaPlugin plugin, CordovaInterface cordova, JSONObject jsonObject, CallbackContext callbackContext) {
+    public void doAction(CordovaPlugin plugin, JSONObject jsonObject, CallbackContext callbackContext) {
         int loginType = jsonObject.optInt("type");
         Log.i(TAG, "login type[1:wechat, 2:QQ] = " + loginType);
         loginType = LOGINTYPE_QQ;
@@ -50,11 +45,11 @@ public class LoginAction implements IPluginAction {
         switch (loginType) {
             case LOGINTYPE_WECHAT:
 //                MobAuthorize(new Wechat(), callbackContext);
-                UmengAuthorize(cordova.getActivity(), SHARE_MEDIA.WEIXIN, callbackContext);
+                UmengAuthorize(plugin.cordova.getActivity(), SHARE_MEDIA.WEIXIN, callbackContext);
                 break;
             case LOGINTYPE_QQ:
 //                MobAuthorize(new QQ(), callbackContext);
-                UmengAuthorize(cordova.getActivity(), SHARE_MEDIA.QQ, callbackContext);
+                UmengAuthorize(plugin.cordova.getActivity(), SHARE_MEDIA.QQ, callbackContext);
                 break;
             default:
                 break;
