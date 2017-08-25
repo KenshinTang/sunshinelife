@@ -11,6 +11,8 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.view.WindowManager;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.yunlinker.ygsh.R;
 
 import org.apache.cordova.CallbackContext;
@@ -25,10 +28,20 @@ import org.apache.cordova.CordovaPlugin;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.UUID;
 
 /**
  * Created by YX on 2017/8/20.
@@ -46,12 +59,20 @@ public class UploadImgAction extends IPluginAction {
     public static final int MY_PERMISSIONS_REQUEST_STORAGE_CODE = 6;
     private PopupWindow mPopupWindow;
     private CordovaPlugin mPlugin;
-
+    private Bitmap mHead;
+    private String path = "/sdcard/myHead/";
+    private String name = "sunshinelife.jpg";
+    public static final String SUCCESS = "success";
+    public static final String FAILURE = "failed";
+    private static final int TIME_OUT = 5 * 60 * 1000; //超时时间
+    private static final String CHARSET = "utf-8"; //设置编码
+    private JSONObject mJSONObject;
     @Override
     public void doAction(final CordovaPlugin plugin, JSONObject jsonObject, CallbackContext callbackContext) {
         LayoutInflater inflater = LayoutInflater.from(plugin.cordova.getActivity());
         View view = inflater.inflate(R.layout.popup_take_photo_layout, null);
         this.mPlugin = plugin;
+        this.mJSONObject = jsonObject;
         mPopupWindow = new PopupWindow(view,
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT);
@@ -121,17 +142,125 @@ public class UploadImgAction extends IPluginAction {
                         } else {
                             setPicToView(head);//保存在SD卡中
                         }
-//                        uploadPrint(filePath);
-//            userImg.setImageBitmap(head);
+                        uploadPrint(path+name);
                     }
                 }
                 break;
         }
     }
 
+    /**
+     * 上传头像
+     */
+    private void uploadPrint(String filePath) {
+        final File file = new File(filePath);
+        try {
+            final String url = mJSONObject.getString("url");
+            String timestamp = mJSONObject.getString("timestamp");
+            String sign = mJSONObject.getString("sign");
+            final HashMap<String,String> params = new HashMap<String, String>();
+            params.put("timestamp",timestamp);
+            params.put("sign",sign);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    uploadFile(file,getUrl(url, params));
+                }
+            }).start();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * android上传文件到服务器
+     *
+     * @param file       需要上传的文件
+     * @param requestURL 请求的rul
+     * @return 返回响应的内容
+     */
+    public String uploadFile(File file, String requestURL) {
+        String BOUNDARY = UUID.randomUUID().toString(); //边界标识 随机生成
+        String PREFIX = "--", LINE_END = "\r\n";
+        String CONTENT_TYPE = "multipart/form-data"; //内容类型
+        if (TextUtils.isEmpty(requestURL)) {
+            Log.i("allen", "请求url为空");
+            return FAILURE;
+        }
+        try {
+            Log.i("allen", "传入的上传url" + requestURL);
+            URL url = new URL(requestURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(TIME_OUT);
+            conn.setConnectTimeout(TIME_OUT);
+            conn.setDoInput(true); //允许输入流
+            conn.setDoOutput(true); //允许输出流
+            conn.setUseCaches(false); //不允许使用缓存
+            conn.setRequestMethod("POST"); //请求方式
+            conn.setRequestProperty("Charset", CHARSET);
+            //设置编码
+            conn.setRequestProperty("connection", "keep-alive");
+            conn.setRequestProperty("Content-Type", CONTENT_TYPE + ";boundary=" + BOUNDARY);
+            if (file != null) {
+                /** * 当文件不为空，把文件包装并且上传 */
+                OutputStream outputSteam = conn.getOutputStream();
+                DataOutputStream dos = new DataOutputStream(outputSteam);
+                /**
+                 * 这里重点注意：
+                 * name里面的值为服务器端需要key 只有这个key 才可以得到对应的文件
+                 * filename是文件的名字，包含后缀名的 比如:abc.png
+                 */
+                dos.write((PREFIX + BOUNDARY + LINE_END + "Content-Disposition: form-data; name=\"img\"; filename=\"" + file.getName() + "\"" + LINE_END + "Content-Type: application/octet-stream; charset=" + CHARSET + LINE_END + LINE_END).getBytes());
+                InputStream is = new FileInputStream(file);
+                byte[] bytes = new byte[1024];
+                int len = 0;
+                while ((len = is.read(bytes)) != -1) {
+                    dos.write(bytes, 0, len);
+                }
+                is.close();
+                dos.write(LINE_END.getBytes());
+                byte[] end_data = (PREFIX + BOUNDARY + PREFIX + LINE_END).getBytes();
+                dos.write(end_data);
+                dos.flush();
+                /**
+                 * 获取响应码 200=成功
+                 * 当响应成功，获取响应的流
+                 */
+                int res = conn.getResponseCode();
+                Log.i("allen", "response code:" + res+"message"+conn.getResponseMessage());
+                if (res == 200) {
+                    return SUCCESS;
+                }
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return FAILURE;
+    }
+
     @Override
     public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
-
+        switch (requestCode){
+            case MY_PERMISSIONS_REQUEST_CAMERA_CODE:{
+                if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    //权限申请成功
+                    takePhoto();
+                }else{
+                    //权限申请失败
+                }
+            }
+            break;
+            case MY_PERMISSIONS_REQUEST_STORAGE_CODE:{
+                if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    //权限申请成功
+                    setPicToView(mHead);//保存在SD卡中
+                }else{
+                    //权限申请失败
+                }
+            }
+        }
     }
 
     /**
@@ -169,7 +298,7 @@ public class UploadImgAction extends IPluginAction {
         intent.putExtra("outputX", 150);
         intent.putExtra("outputY", 150);
         intent.putExtra("return-data", true);
-        mPlugin.cordova.startActivityForResult(mPlugin, intent, 3);
+        mPlugin.cordova.startActivityForResult(mPlugin, intent, CROP_TYPE);
     }
 
     /**
@@ -181,10 +310,9 @@ public class UploadImgAction extends IPluginAction {
             return;
         }
         FileOutputStream b = null;
-        String path = "/sdcard/myHead/";
         File file = new File(path);
         file.mkdirs();// 创建文件夹
-        String fileName = path + "sunshinelife.jpg";//图片名字
+        String fileName = path + name;//图片名字
         try {
             b = new FileOutputStream(fileName);
             mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);// 把数据写入文件
@@ -200,4 +328,35 @@ public class UploadImgAction extends IPluginAction {
             }
         }
     }
+
+    /**
+     * 拼接URL
+     * @param baseUrl 接口请求地址
+     * @param params 请求参数
+     * @return 拼接的url
+     */
+    private static String getUrl(String baseUrl ,HashMap<String, String> params) {
+        String url = baseUrl;
+        // 添加url参数
+        if (params != null) {
+            Iterator<String> it = params.keySet().iterator();
+            StringBuffer sb = null;
+            while (it.hasNext()) {
+                String key = it.next();
+                String value = params.get(key);
+                if (sb == null) {
+                    sb = new StringBuffer();
+                    sb.append("?");
+                } else {
+                    sb.append("&");
+                }
+                sb.append(key);
+                sb.append("=");
+                sb.append(value);
+            }
+            url += sb.toString();
+        }
+        return url;
+    }
+
 }
