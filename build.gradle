@@ -251,6 +251,7 @@ dependencies {
     debugCompile project(path: 'CordovaLib', configuration: 'debug')
     releaseCompile project(path: 'CordovaLib', configuration: 'release')
     // SUB-PROJECT DEPENDENCIES END
+    compile project(':UMengPushLib')
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.code.gson:gson:2.8.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
