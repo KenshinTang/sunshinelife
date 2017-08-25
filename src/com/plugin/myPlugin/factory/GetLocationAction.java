@@ -1,12 +1,10 @@
 package com.plugin.myPlugin.factory;
 
-import android.content.Intent;
 import android.util.Log;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
-import com.yunlinker.ygsh.MapLocation;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
