@@ -1,13 +1,11 @@
 package com.yunlinker.ygsh;
 
-import android.Manifest;
 import android.app.Application;
-import android.os.Build;
-import android.support.v4.app.ActivityCompat;
 
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
 import com.mob.MobSDK;
+import com.plugin.myPlugin.factory.PluginActionFactory;
 import com.umeng.socialize.Config;
 import com.umeng.socialize.PlatformConfig;
 import com.umeng.socialize.utils.ContextUtil;
@@ -25,6 +23,7 @@ public class YunApplication extends Application {
 //        initMobSDK();
         initUmengSDK();
         initBaiduSDK();
+        PluginActionFactory.initProperties();
     }
 
     private void initMobSDK() {
