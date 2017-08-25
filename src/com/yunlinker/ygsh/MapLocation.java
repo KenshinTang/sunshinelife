@@ -63,6 +63,7 @@ import com.yunlinker.ygsh.util.ToastUtil;
 import com.yunlinker.ygsh.view.SearchEditView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -588,11 +589,17 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
 
         @Override
         public int getCount() {
+            if (dataList == null) {
+                return 0;
+            }
             return dataList.size();
         }
 
         @Override
         public Object getItem(int position) {
+            if (dataList == null || position >= dataList.size()) {
+                return null;
+            }
             return dataList.get(position);
         }
 
@@ -640,7 +647,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
     private class PoiSearchAdapter extends BaseAdapter {
 
         private Context context;
-        private List<PoiInfo> poiInfos;
+        private List<PoiInfo> poiInfos = new ArrayList<>();
 
         public PoiSearchAdapter(Context context, List<PoiInfo> poiInfos) {
             this.context = context;
@@ -657,7 +664,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
 
         @Override
         public Object getItem(int position) {
-            if (poiInfos == null) {
+            if (poiInfos == null || position >= poiInfos.size()) {
                 return null;
             }
             return poiInfos.get(position);

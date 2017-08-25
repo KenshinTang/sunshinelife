@@ -64,7 +64,7 @@ public class UploadImgAction extends IPluginAction {
     private PopupWindow mPopupWindow;
     private CordovaPlugin mPlugin;
     private Bitmap mHead;
-    private String mPath = "/sdcard/myHead/";
+    private String mPath = Environment.getExternalStorageDirectory().getPath()+"/myHead/";
     private String mFilename = "sunshinelife.jpg";
     public static final String SUCCESS = "success";
     public static final String FAILURE = "failed";
@@ -88,6 +88,10 @@ public class UploadImgAction extends IPluginAction {
         mPopupWindow.showAtLocation(plugin.cordova.getActivity().getCurrentFocus(),
                 Gravity.BOTTOM, 0, 0);
 
+        setOnClickEvent(plugin, view);
+    }
+
+    private void setOnClickEvent(final CordovaPlugin plugin, View view) {
         TextView takePhoto = (TextView) view.findViewById(R.id.take_photo);
         takePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,14 +142,14 @@ public class UploadImgAction extends IPluginAction {
             case CROP_TYPE:
                 if (intent != null) {
                     Bundle extras = intent.getExtras();
-                    Bitmap head = extras.getParcelable("data");
-                    if (head != null) {
+                    mHead = extras.getParcelable("data");
+                    if (mHead != null) {
                         //Android 6.0 需要检查权限 ，对于没有权限的需要先申请权限
                         if (ContextCompat.checkSelfPermission(mPlugin.cordova.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             //申请拍照权限
                             ActivityCompat.requestPermissions(mPlugin.cordova.getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_STORAGE_CODE);
                         } else {
-                            setPicToView(head);//保存在SD卡中
+                            setPicToView(mHead);//保存在SD卡中
                         }
                         uploadPic(mPath + mFilename);
                     }
@@ -261,6 +265,7 @@ public class UploadImgAction extends IPluginAction {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //权限申请成功
                     setPicToView(mHead);//保存在SD卡中
+                    uploadPic(mPath + mFilename);
                 } else {
                     //权限申请失败
                 }
@@ -292,7 +297,7 @@ public class UploadImgAction extends IPluginAction {
     /**
      * 调用系统的裁剪
      */
-    public void cropPhoto(Uri uri) {
+    private void cropPhoto(Uri uri) {
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(uri, "image/*");
         intent.putExtra("crop", "true");
