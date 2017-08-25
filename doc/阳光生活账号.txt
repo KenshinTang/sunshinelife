@@ -32,6 +32,9 @@ IOS开发者账号：
 账号：3394608072@qq.com
 密码：He2006zhe220
 http://www.umeng.com/
+AppKey: 599d871245297d4ece0018c2
+Umeng Message Secret: c35f1e32b3c101d877e6919472d3bbe9
+App Master Secret: udgqf9npdlnm30dmxhcj2gisdxgetwz7
 
 
 腾讯应用宝,QQ,QQZone（个人账号）
