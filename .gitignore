@@ -18,3 +18,5 @@ sunshinelife.iml
 CordovaLib/build
 CordovaLib/CordovaLib.iml
 *.iml
+UMengPushLib/build
+UMengPushLib/UMengPushLib.iml
