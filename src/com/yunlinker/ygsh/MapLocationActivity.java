@@ -63,7 +63,6 @@ import com.yunlinker.ygsh.util.ToastUtil;
 import com.yunlinker.ygsh.view.SearchEditView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -72,7 +71,7 @@ import java.util.List;
  * date:  2017/8/19 16:33<br>
  * description:
  */
-public class MapLocation extends Activity implements OnGetPoiSearchResultListener, BaiduMap.OnMapStatusChangeListener {
+public class MapLocationActivity extends Activity implements OnGetPoiSearchResultListener, BaiduMap.OnMapStatusChangeListener {
 
     /**
      * 定位SDK的核心类
@@ -562,7 +561,7 @@ public class MapLocation extends Activity implements OnGetPoiSearchResultListene
             // 创建POI检索实例
             mPoiSearch = PoiSearch.newInstance();
             // 设置监听器
-            mPoiSearch.setOnGetPoiSearchResultListener(MapLocation.this);
+            mPoiSearch.setOnGetPoiSearchResultListener(MapLocationActivity.this);
             //设置地图中心点位置
             MapStatus status = new MapStatus.Builder().target(locationLatLng).build();
             searchMoveFinish(status.target);

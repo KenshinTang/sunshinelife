@@ -2,7 +2,7 @@ package com.plugin.myPlugin.factory;
 
 import android.content.Intent;
 
-import com.yunlinker.ygsh.MapLocation;
+import com.yunlinker.ygsh.MapLocationActivity;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -20,7 +20,7 @@ public class GetPositionAction extends IPluginAction {
     @Override
     public void doAction(CordovaPlugin plugin, JSONObject jsonObject, CallbackContext callbackContext) {
         this.mCallbackContext = callbackContext;
-        Intent intent = new Intent(plugin.cordova.getActivity(), MapLocation.class);
+        Intent intent = new Intent(plugin.cordova.getActivity(), MapLocationActivity.class);
         plugin.cordova.startActivityForResult(plugin, intent, GET_LOCATION);
     }
 

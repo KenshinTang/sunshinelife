@@ -1,11 +1,14 @@
 package com.yunlinker.ygsh;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
 import com.mob.MobSDK;
 import com.plugin.myPlugin.factory.PluginActionFactory;
+import com.umeng.message.IUmengRegisterCallback;
+import com.umeng.message.PushAgent;
 import com.umeng.socialize.Config;
 import com.umeng.socialize.PlatformConfig;
 import com.umeng.socialize.utils.ContextUtil;
@@ -16,6 +19,7 @@ import com.umeng.socialize.utils.ContextUtil;
  */
 
 public class YunApplication extends Application {
+    private static final String TAG = "YunApplication";
 
     @Override
     public void onCreate() {
@@ -40,10 +44,24 @@ public class YunApplication extends Application {
     }
 
     private void initUmengSDK() {
+        //分享和登录的SDK
         Config.DEBUG = true;
         ContextUtil.setContext(this);
-        PlatformConfig.setWeixin("","");
-        PlatformConfig.setQQZone("1105543710","WcTA1g0pEeT50ccg");
+        PlatformConfig.setWeixin("", "");
+        PlatformConfig.setQQZone("1105543710", "WcTA1g0pEeT50ccg");
+
+        //消息推送的SDK
+        PushAgent.getInstance(this).register(new IUmengRegisterCallback() {
+            @Override
+            public void onSuccess(String s) {
+                Log.i(TAG, "UMeng push register success, device token = " + s);
+            }
+
+            @Override
+            public void onFailure(String s, String s1) {
+                Log.w(TAG, "UMeng push register failed, " + s + ", " + s1);
+            }
+        });
     }
 }
 
