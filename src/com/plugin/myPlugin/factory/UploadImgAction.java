@@ -189,6 +189,7 @@ public class UploadImgAction extends IPluginAction {
      * @return 返回响应的内容
      */
     public String uploadFile(File file, String requestURL) {
+        String result = null;
         String BOUNDARY = UUID.randomUUID().toString(); //边界标识 随机生成
         String PREFIX = "--", LINE_END = "\r\n";
         String CONTENT_TYPE = "multipart/form-data"; //内容类型
@@ -236,8 +237,17 @@ public class UploadImgAction extends IPluginAction {
                  * 当响应成功，获取响应的流
                  */
                 int res = conn.getResponseCode();
-                Log.i("allen", "response code:" + res + "message" + conn.getResponseMessage());
+                Log.i("allen", "response code:" + res);
                 if (res == 200) {
+                    InputStream input =  conn.getInputStream();
+                    StringBuffer sb1= new StringBuffer();
+                    int ss ;
+                    while((ss=input.read())!=-1)
+                    {
+                        sb1.append((char)ss);
+                    }
+                    result = sb1.toString();
+                    Log.i("allen", "result : "+ result);
                     return SUCCESS;
                 }
             }
