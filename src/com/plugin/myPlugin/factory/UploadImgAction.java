@@ -25,6 +25,18 @@ import android.webkit.MimeTypeMap;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.alibaba.sdk.android.oss.ClientConfiguration;
+import com.alibaba.sdk.android.oss.ClientException;
+import com.alibaba.sdk.android.oss.OSS;
+import com.alibaba.sdk.android.oss.OSSClient;
+import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
+import com.alibaba.sdk.android.oss.common.OSSLog;
+import com.alibaba.sdk.android.oss.common.auth.OSSCredentialProvider;
+import com.alibaba.sdk.android.oss.common.auth.OSSStsTokenCredentialProvider;
+import com.alibaba.sdk.android.oss.internal.OSSAsyncTask;
+import com.alibaba.sdk.android.oss.model.PutObjectRequest;
+import com.alibaba.sdk.android.oss.model.PutObjectResult;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
@@ -65,11 +77,11 @@ public class UploadImgAction extends IPluginAction {
     /**
      * 请求类型 1：拍照；2：相册；3：裁剪
      */
-    public static final int TAKE_TYPE = 1;
-    public static final int ALBUM_TYPE = 2;
-    public static final int CROP_TYPE = 3;
-    public static final int MY_PERMISSIONS_REQUEST_CAMERA_CODE = 5;
-    public static final int MY_PERMISSIONS_REQUEST_STORAGE_CODE = 6;
+    private static final int TAKE_TYPE = 1;
+    private static final int ALBUM_TYPE = 2;
+    private static final int CROP_TYPE = 3;
+    private static final int MY_PERMISSIONS_REQUEST_CAMERA_CODE = 5;
+    private static final int MY_PERMISSIONS_REQUEST_STORAGE_CODE = 6;
     private PopupWindow mPopupWindow;
     private CordovaPlugin mPlugin;
     private String mPath = Environment.getExternalStorageDirectory().getPath()+"/myHead/";
@@ -163,10 +175,11 @@ public class UploadImgAction extends IPluginAction {
         }
     }
 
+    private OSS oss;
     /**
      * 上传头像
      */
-    private void uploadPic(String filePath) {
+    private void uploadPic(final String filePath) {
 //      final File file = new File(filePath);
         try {
             final String url = mJSONObject.getString("url");
@@ -177,19 +190,73 @@ public class UploadImgAction extends IPluginAction {
             params.put("sign", sign);
             RequestParams requestParams = new RequestParams();
             String sendUrl = getUrl(url, params);
-            String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension("png");
-            requestParams.addBodyParameter("imgFile", new File(filePath), mime);
+//            String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension("png");
+//            requestParams.addBodyParameter("imgFile", new File(filePath), mime);
 
             HttpUtils httpUtils = new HttpUtils();
             httpUtils.send(HttpRequest.HttpMethod.POST, sendUrl, requestParams, new RequestCallBack<Object>() {
                 @Override
                 public void onSuccess(ResponseInfo<Object> responseInfo) {
-                    Log.d("allen", "success");
+                    Log.d("kenshin", "success:" + responseInfo.result.toString());
                     try {
+
+//                        {"status":"200",
+//                                "AccessKeyId":"STS.GEtzwf1SXmUgn3Wkwc3yBtRmD",
+//                                "AccessKeySecret":"CsXxaA2sCVC7LLvLVksfw6dSLWpqJiy8gSVKaWUfncmn",
+//                                "SecurityToken":"CAIShwJ1q6Ft5B2yfSjIpobBMc3S3Ix52peMbBXmj3c2P/Zum5fGpjz2IHhKe3RsAeAZtPk2mm1X6/8SlqQqFsceGhCfN5Erv8oIqZoAghNI+J7b16cNrbH4M0rxYkeJ8a2/SuH9S8ynCZXJQlvYlyh17KLnfDG5JTKMOoGIjpgVBbZ+HHPPD1x8CcxROxFppeIDKHLVLozNCBPxhXfKB0ca0WgVy0EHsPTkk5PBtUeG1wWnkbFI+76ceMb0M5NeW75kSMqw0eBMca7M7TVd8RAi9t0t1PIbpGuf7o7HXgAPvkrbarrOgdRrLR5kYK8hALJDr/X6mvB+t/bai4Pt0RFJMPHrlaUopk1qqxqAAZKiUed92nHx+rqUp9/uDL1far+PkkpsTe4GqC8Nx9KIfUhkKUUlUHsPqfUM6N4lKtoLkzaeIrvcVPz/+MWbafbU+h2W2azEvG/CqDKiaqIOMPOh5ww2wGPXirjwI197Y5Jj7WkZIrBz+TDt735APw1Ltb/Y5syS3S+AqhEdjE23"
+//                                ,"Expiration":"2017-08-26T10:42:04Z",
+//                                "dir":"2017-08",
+//                                "filename":"1503743224223"}
                         JSONObject resultJb = new JSONObject(responseInfo.result.toString());
+                        String AccessKeyId = resultJb.getString("AccessKeyId");
+                        String AccessKeySecret = resultJb.getString("AccessKeySecret");
+                        String SecurityToken = resultJb.getString("SecurityToken");
                         String dir = resultJb.getString("dir");
                         String filename = resultJb.getString("filename");
                         String imgName = dir + "/" + filename + ".jpg";
+                        OSSCredentialProvider credentialProvider = new OSSStsTokenCredentialProvider(AccessKeyId, AccessKeySecret, SecurityToken);
+                        ClientConfiguration conf = new ClientConfiguration();
+                        conf.setConnectionTimeout(15 * 1000); // 连接超时，默认15秒
+                        conf.setSocketTimeout(15 * 1000); // socket超时，默认15秒
+                        conf.setMaxConcurrentRequest(5); // 最大并发请求书，默认5个
+                        conf.setMaxErrorRetry(2); // 失败后最大重试次数，默认2次
+                        OSSLog.enableLog();
+                        oss = new OSSClient(mPlugin.cordova.getActivity().getApplicationContext(), "http://oss-cn-shenzhen.aliyuncs.com", credentialProvider, conf);
+
+                        try {
+                            Log.i("kenshin", "uploadFilePath : " + filePath);
+                            File uploadFile = new File(filePath);
+                            InputStream input = new FileInputStream(uploadFile);
+                            long fileLength = uploadFile.length();
+                            Log.i("kenshin", "fileLength : " + fileLength);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        PutObjectRequest put = new PutObjectRequest("ygsh", imgName, filePath);
+
+                        OSSAsyncTask task = oss.asyncPutObject(put, new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
+                            @Override
+                            public void onSuccess(PutObjectRequest request, PutObjectResult result) {
+                                Log.d("kenshin", "UploadSuccess");
+                            }
+                            @Override
+                            public void onFailure(PutObjectRequest request, ClientException clientExcepion, ServiceException serviceException) {
+                                // 请求异常
+                                if (clientExcepion != null) {
+                                    // 本地异常如网络异常等
+                                    clientExcepion.printStackTrace();
+                                }
+                                if (serviceException != null) {
+                                    // 服务异常
+                                    Log.e("kenshin", serviceException.getErrorCode());
+                                    Log.e("kenshin", serviceException.getRequestId());
+                                    Log.e("kenshin", serviceException.getHostId());
+                                    Log.e("kenshin", serviceException.getRawMessage());
+                                }
+                            }
+                        });
+
                         JSONObject dataObject = new JSONObject();
                         JSONObject callbackJsonObject = new JSONObject();
                         dataObject.put("data", callbackJsonObject);
