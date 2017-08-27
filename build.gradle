@@ -243,6 +243,7 @@ android {
     if (cdvDebugSigningPropertiesFile) {
         addSigningProps(cdvDebugSigningPropertiesFile, signingConfigs.debug)
     }
+    useLibrary 'org.apache.http.legacy'
 }
 
 dependencies {

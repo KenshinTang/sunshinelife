@@ -20,9 +20,16 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.MimeTypeMap;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
 import com.yunlinker.ygsh.R;
 
 import org.apache.cordova.CallbackContext;
@@ -165,7 +172,7 @@ public class UploadImgAction extends IPluginAction {
      * 上传头像
      */
     private void uploadPic(String filePath) {
-        final File file = new File(filePath);
+//      final File file = new File(filePath);
         try {
             final String url = mJSONObject.getString("url");
             String timestamp = mJSONObject.getString("timestamp");
@@ -173,12 +180,48 @@ public class UploadImgAction extends IPluginAction {
             final HashMap<String, String> params = new HashMap<>();
             params.put("timestamp", timestamp);
             params.put("sign", sign);
-            Executors.newCachedThreadPool().execute(new Runnable() {
+            RequestParams requestParams = new RequestParams();
+            String sendUrl = getUrl(url,params);
+            String mime= MimeTypeMap.getSingleton().getMimeTypeFromExtension("png");
+            requestParams.addBodyParameter("imgFile",new File(filePath),mime);
+
+            HttpUtils httpUtils = new HttpUtils();
+            httpUtils.send(HttpRequest.HttpMethod.POST, sendUrl, requestParams, new RequestCallBack<Object>() {
                 @Override
-                public void run() {
-                    uploadFile(file, getUrl(url, params));
+                public void onSuccess(ResponseInfo<Object> responseInfo) {
+                    Log.d("allen","success");
+                    try {
+                        JSONObject resultJb = new JSONObject(responseInfo.result.toString());
+                        String dir = resultJb.getString("dir");
+                        String filename = resultJb.getString("filename");
+                        String imgName = dir + "/"+filename + ".jpg";
+                        JSONObject callbackJsonObject = new JSONObject();
+//                    {code: 成功1，失败0, msg: 描述, imgUrl: [2017-03/12345.jpg,2017-03/12346.jpg]}
+                        JSONArray array = new JSONArray();
+                        array.put(imgName);
+                        callbackJsonObject.put("code",1);
+                        callbackJsonObject.put("msg","上传成功");
+                        callbackJsonObject.put("imgUrl",array);
+                        mCallbackContext.success(callbackJsonObject);
+                        Log.i("allen", "callbackMessage : " + callbackJsonObject.toString());
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(HttpException e, String s) {
+
                 }
             });
+
+
+//            Executors.newCachedThreadPool().execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    uploadFile(file, getUrl(url, params));
+//                }
+//            });
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -1,6 +1,7 @@
 package com.yunlinker.ygsh;
 
 import android.app.Application;
+import android.os.StrictMode;
 import android.util.Log;
 
 import com.baidu.mapapi.CoordType;
@@ -28,6 +29,10 @@ public class YunApplication extends Application {
         initUmengSDK();
         initBaiduSDK();
         PluginActionFactory.initProperties();
+        // android 7.0系统解决拍照的问题
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+        builder.detectFileUriExposure();
     }
 
     private void initMobSDK() {
