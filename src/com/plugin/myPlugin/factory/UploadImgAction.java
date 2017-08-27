@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -71,9 +72,9 @@ public class UploadImgAction extends IPluginAction {
     public static final int MY_PERMISSIONS_REQUEST_STORAGE_CODE = 6;
     private PopupWindow mPopupWindow;
     private CordovaPlugin mPlugin;
-    private Bitmap mHead;
     private String mPath = Environment.getExternalStorageDirectory().getPath()+"/myHead/";
     private String mFilename = "sunshinelife.jpg";
+    private Uri imageUri = Uri.parse("file:///"+Environment.getExternalStorageDirectory().getPath()+"/"+mFilename);
     public static final String SUCCESS = "success";
     public static final String FAILURE = "failed";
     private static final int TIME_OUT = 5 * 60 * 1000; //超时时间
@@ -138,30 +139,24 @@ public class UploadImgAction extends IPluginAction {
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         switch (requestCode) {
             case TAKE_TYPE:
-                if (resultCode == -1) {
-                    File temp = new File(Environment.getExternalStorageDirectory()
-                            + "/"+mFilename);
-                    cropPhoto(Uri.fromFile(temp));//裁剪图片
-                }
+                cropPhoto(imageUri,CROP_TYPE);//裁剪图片
                 break;
             case ALBUM_TYPE:
-                if (resultCode == -1) {
-                    cropPhoto(intent.getData());//裁剪图片
-                }
+                cropPhoto(imageUri,CROP_TYPE);
                 break;
             case CROP_TYPE:
-                if (intent != null) {
-                    Bundle extras = intent.getExtras();
-                    mHead = extras.getParcelable("data");
-                    if (mHead != null) {
+                if (imageUri != null) {
+                    Bitmap bitmap = decodeUriAsBitmap(imageUri);
+                    if (bitmap != null) {
+                        Log.d("allen", "onActivityResult: mHead" + bitmap.getWidth() + "height" + bitmap.getHeight());
                         //Android 6.0 需要检查权限 ，对于没有权限的需要先申请权限
                         if (ContextCompat.checkSelfPermission(mPlugin.cordova.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             //申请拍照权限
                             ActivityCompat.requestPermissions(mPlugin.cordova.getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_STORAGE_CODE);
                         } else {
-                            setPicToView(mHead);//保存在SD卡中
+                            setPicToView(bitmap);//保存在SD卡中
                         }
-                        uploadPic(mPath + mFilename);
+                        uploadPic(mPath+mFilename);
                     }
                 }
                 break;
@@ -181,30 +176,32 @@ public class UploadImgAction extends IPluginAction {
             params.put("timestamp", timestamp);
             params.put("sign", sign);
             RequestParams requestParams = new RequestParams();
-            String sendUrl = getUrl(url,params);
-            String mime= MimeTypeMap.getSingleton().getMimeTypeFromExtension("png");
-            requestParams.addBodyParameter("imgFile",new File(filePath),mime);
+            String sendUrl = getUrl(url, params);
+            String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension("png");
+            requestParams.addBodyParameter("imgFile", new File(filePath), mime);
 
             HttpUtils httpUtils = new HttpUtils();
             httpUtils.send(HttpRequest.HttpMethod.POST, sendUrl, requestParams, new RequestCallBack<Object>() {
                 @Override
                 public void onSuccess(ResponseInfo<Object> responseInfo) {
-                    Log.d("allen","success");
+                    Log.d("allen", "success");
                     try {
                         JSONObject resultJb = new JSONObject(responseInfo.result.toString());
                         String dir = resultJb.getString("dir");
                         String filename = resultJb.getString("filename");
-                        String imgName = dir + "/"+filename + ".jpg";
+                        String imgName = dir + "/" + filename + ".jpg";
+                        JSONObject dataObject = new JSONObject();
                         JSONObject callbackJsonObject = new JSONObject();
+                        dataObject.put("data", callbackJsonObject);
 //                    {code: 成功1，失败0, msg: 描述, imgUrl: [2017-03/12345.jpg,2017-03/12346.jpg]}
                         JSONArray array = new JSONArray();
                         array.put(imgName);
-                        callbackJsonObject.put("code",1);
-                        callbackJsonObject.put("msg","上传成功");
-                        callbackJsonObject.put("imgUrl",array);
-                        mCallbackContext.success(callbackJsonObject);
-                        Log.i("allen", "callbackMessage : " + callbackJsonObject.toString());
-                    }catch(Exception e){
+                        callbackJsonObject.put("code", 1);
+                        callbackJsonObject.put("msg", "上传成功");
+                        callbackJsonObject.put("imgUrl", array);
+                        mCallbackContext.success(dataObject);
+                        Log.i("allen", "callbackMessage : " + dataObject.toString());
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -296,14 +293,14 @@ public class UploadImgAction extends IPluginAction {
                     JSONObject jsonObject = new JSONObject(result);
                     String dir = jsonObject.getString("dir");
                     String filename = jsonObject.getString("filename");
-                    String imgName = dir + "/"+filename + ".jpg";
+                    String imgName = dir + "/" + filename + ".jpg";
                     JSONObject callbackJsonObject = new JSONObject();
 //                    {code: 成功1，失败0, msg: 描述, imgUrl: [2017-03/12345.jpg,2017-03/12346.jpg]}
                     JSONArray array = new JSONArray();
                     array.put(imgName);
-                    callbackJsonObject.put("code",1);
-                    callbackJsonObject.put("msg","上传成功");
-                    callbackJsonObject.put("imgUrl",array);
+                    callbackJsonObject.put("code", 1);
+                    callbackJsonObject.put("msg", "上传成功");
+                    callbackJsonObject.put("imgUrl", array);
                     mCallbackContext.success(callbackJsonObject);
                     Log.i("allen", "callbackMessage : " + callbackJsonObject.toString());
                     return SUCCESS;
@@ -315,8 +312,8 @@ public class UploadImgAction extends IPluginAction {
         JSONObject errorObject = null;
         try {
             errorObject = new JSONObject();
-            errorObject.put("msg","上传失败");
-            errorObject.put("code",0);
+            errorObject.put("msg", "上传失败");
+            errorObject.put("code", 0);
             mCallbackContext.error(errorObject);
         } catch (Exception e) {
             e.printStackTrace();
@@ -339,7 +336,7 @@ public class UploadImgAction extends IPluginAction {
             case MY_PERMISSIONS_REQUEST_STORAGE_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //权限申请成功
-                    setPicToView(mHead);//保存在SD卡中
+                    setPicToView(decodeUriAsBitmap(imageUri));//保存在SD卡中
                     uploadPic(mPath + mFilename);
                 } else {
                     //权限申请失败
@@ -354,8 +351,7 @@ public class UploadImgAction extends IPluginAction {
     private void takePhoto() {
         mPopupWindow.dismiss();
         Intent takeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        takeIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
-                mFilename)));
+        takeIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         mPlugin.cordova.startActivityForResult(mPlugin, takeIntent, TAKE_TYPE);
     }
 
@@ -368,22 +364,20 @@ public class UploadImgAction extends IPluginAction {
         albumIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
         mPlugin.cordova.startActivityForResult(mPlugin, albumIntent, ALBUM_TYPE);
     }
-
-    /**
-     * 调用系统的裁剪
-     */
-    private void cropPhoto(Uri uri) {
+    private void cropPhoto(Uri uri,int requestCode){
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(uri, "image/*");
         intent.putExtra("crop", "true");
-        // aspectX aspectY 是宽高的比例
         intent.putExtra("aspectX", 1);
         intent.putExtra("aspectY", 1);
-        // outputX outputY 是裁剪图片宽高
-        intent.putExtra("outputX", 150);
-        intent.putExtra("outputY", 150);
-        intent.putExtra("return-data", true);
-        mPlugin.cordova.startActivityForResult(mPlugin, intent, CROP_TYPE);
+        intent.putExtra("outputX", 800);
+        intent.putExtra("outputY", 800);
+        intent.putExtra("scale", true);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        intent.putExtra("return-data", false);
+        intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+        intent.putExtra("noFaceDetection", true); // no face detection
+        mPlugin.cordova.startActivityForResult(mPlugin, intent, requestCode);
     }
 
     /**
@@ -443,6 +437,17 @@ public class UploadImgAction extends IPluginAction {
             url += sb.toString();
         }
         return url;
+    }
+
+    private Bitmap decodeUriAsBitmap(Uri uri) {
+        Bitmap bitmap = null;
+        try {
+            bitmap = BitmapFactory.decodeStream(mPlugin.cordova.getActivity().getContentResolver().openInputStream(uri));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return bitmap;
     }
 
 }
