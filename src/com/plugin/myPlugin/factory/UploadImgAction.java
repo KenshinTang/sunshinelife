@@ -27,6 +27,7 @@ import com.yunlinker.ygsh.R;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -71,6 +72,7 @@ public class UploadImgAction extends IPluginAction {
     private static final int TIME_OUT = 5 * 60 * 1000; //超时时间
     private static final String CHARSET = "utf-8"; //设置编码
     private JSONObject mJSONObject;
+    private CallbackContext mCallbackContext;
 
     @Override
     public void doAction(final CordovaPlugin plugin, JSONObject jsonObject, CallbackContext callbackContext) {
@@ -78,6 +80,7 @@ public class UploadImgAction extends IPluginAction {
         View view = inflater.inflate(R.layout.popup_take_photo_layout, null);
         this.mPlugin = plugin;
         this.mJSONObject = jsonObject;
+        this.mCallbackContext = callbackContext;
         mPopupWindow = new PopupWindow(view,
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT);
@@ -239,21 +242,40 @@ public class UploadImgAction extends IPluginAction {
                 int res = conn.getResponseCode();
                 Log.i("allen", "response code:" + res);
                 if (res == 200) {
-                    InputStream input =  conn.getInputStream();
-                    StringBuffer sb1= new StringBuffer();
-                    int ss ;
-                    while((ss=input.read())!=-1)
-                    {
-                        sb1.append((char)ss);
+                    InputStream input = conn.getInputStream();
+                    StringBuffer sb1 = new StringBuffer();
+                    int ss;
+                    while ((ss = input.read()) != -1) {
+                        sb1.append((char) ss);
                     }
                     result = sb1.toString();
-                    Log.i("allen", "result : "+ result);
+                    Log.i("allen", "result : " + result);
+                    JSONObject jsonObject = new JSONObject(result);
+                    String dir = jsonObject.getString("dir");
+                    String filename = jsonObject.getString("filename");
+                    String imgName = dir + "/"+filename + ".jpg";
+                    JSONObject callbackJsonObject = new JSONObject();
+//                    {code: 成功1，失败0, msg: 描述, imgUrl: [2017-03/12345.jpg,2017-03/12346.jpg]}
+                    JSONArray array = new JSONArray();
+                    array.put(imgName);
+                    callbackJsonObject.put("code",1);
+                    callbackJsonObject.put("msg","上传成功");
+                    callbackJsonObject.put("imgUrl",array);
+                    mCallbackContext.success(callbackJsonObject);
+                    Log.i("allen", "callbackMessage : " + callbackJsonObject.toString());
                     return SUCCESS;
                 }
             }
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IOException e) {
+        }
+        JSONObject errorObject = null;
+        try {
+            errorObject = new JSONObject();
+            errorObject.put("msg","上传失败");
+            errorObject.put("code",0);
+            mCallbackContext.error(errorObject);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return FAILURE;
