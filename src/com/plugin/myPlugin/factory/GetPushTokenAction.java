@@ -21,7 +21,7 @@ public class GetPushTokenAction extends IPluginAction {
     public void doAction(CordovaPlugin plugin, JSONObject jsonObject, CallbackContext callbackContext) {
         String token = PushAgent.getInstance(plugin.cordova.getActivity()).getRegistrationId();
         Log.i(TAG, "UMeng Push Token :" + token);
-        boolean isValid = checkToekn(token);
+        boolean isValid = checkToken(token);
         try {
             JSONObject jo = new JSONObject();
             jo.put("code", isValid ? 1 : 0);
@@ -38,7 +38,7 @@ public class GetPushTokenAction extends IPluginAction {
         }
     }
 
-    private boolean checkToekn(String token) {
+    private boolean checkToken(String token) {
         //UMeng的推送Token, 长度固定为44位
         if (TextUtils.isEmpty(token) || token.length() != 44) {
             return false;
