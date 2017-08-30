@@ -42,7 +42,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -70,7 +69,6 @@ public class UploadImgAction extends IPluginAction {
     private static final int MY_PERMISSIONS_REQUEST_STORAGE_CODE = 6;
     private PopupWindow mPopupWindow;
     private CordovaPlugin mPlugin;
-    private String mPath = Environment.getExternalStorageDirectory().getPath()+"/myHead/";
     private String mFilename = "sunshinelife.jpg";
     private Uri imageUri = Uri.parse("file:///"+Environment.getExternalStorageDirectory().getPath()+"/"+mFilename);
     private JSONObject mJSONObject;
@@ -92,7 +90,6 @@ public class UploadImgAction extends IPluginAction {
         mPopupWindow.setAnimationStyle(R.style.mypopwindow_anim_style);
         mPopupWindow.showAtLocation(plugin.cordova.getActivity().getCurrentFocus(),
                 Gravity.BOTTOM, 0, 0);
-
         setOnClickEvent(plugin, view);
     }
 
@@ -142,15 +139,12 @@ public class UploadImgAction extends IPluginAction {
                 if (imageUri != null) {
                     Bitmap bitmap = decodeUriAsBitmap(imageUri);
                     if (bitmap != null) {
-                        Log.d("allen", "onActivityResult: mHead" + bitmap.getWidth() + "height" + bitmap.getHeight());
                         //Android 6.0 需要检查权限 ，对于没有权限的需要先申请权限
                         if (ContextCompat.checkSelfPermission(mPlugin.cordova.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             //申请拍照权限
                             ActivityCompat.requestPermissions(mPlugin.cordova.getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_STORAGE_CODE);
-                        } else {
-                            setPicToView(bitmap);//保存在SD卡中
                         }
-                        uploadPic(mPath+mFilename);
+                        uploadPic();
                     }
                 }
                 break;
@@ -159,7 +153,7 @@ public class UploadImgAction extends IPluginAction {
     /**
      * 上传头像
      */
-    private void uploadPic(final String filePath) {
+    private void uploadPic() {
         try {
             final String url = mJSONObject.getString("url");
             String timestamp = mJSONObject.getString("timestamp");
@@ -208,9 +202,8 @@ public class UploadImgAction extends IPluginAction {
                         OSSLog.enableLog();
                         oss = new OSSClient(mPlugin.cordova.getActivity().getApplicationContext(), "http://oss-cn-shenzhen.aliyuncs.com", credentialProvider, conf);
 
+                        File uploadFile = new File(imageUri.toString());
                         try {
-                            Log.i("kenshin", "uploadFilePath : " + filePath);
-                            File uploadFile = new File(filePath);
                             InputStream input = new FileInputStream(uploadFile);
                             long fileLength = uploadFile.length();
                             Log.i("kenshin", "fileLength : " + fileLength);
@@ -218,7 +211,7 @@ public class UploadImgAction extends IPluginAction {
                             e.printStackTrace();
                         }
 
-                        PutObjectRequest put = new PutObjectRequest("ygsh", imgName, filePath);
+                        PutObjectRequest put = new PutObjectRequest("ygsh", imgName, imageUri.getPath());
                         OSSAsyncTask task = oss.asyncPutObject(put, new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
                             @Override
                             public void onSuccess(PutObjectRequest request, PutObjectResult result) {
@@ -280,8 +273,7 @@ public class UploadImgAction extends IPluginAction {
             case MY_PERMISSIONS_REQUEST_STORAGE_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //权限申请成功
-                    setPicToView(decodeUriAsBitmap(imageUri));//保存在SD卡中
-                    uploadPic(mPath + mFilename);
+                    uploadPic();
                 } else {
                     //权限申请失败
                 }
@@ -328,34 +320,6 @@ public class UploadImgAction extends IPluginAction {
         intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
         intent.putExtra("noFaceDetection", true); // no face detection
         mPlugin.cordova.startActivityForResult(mPlugin, intent, CROP_TYPE);
-    }
-
-    /**
-     * 保存图片到sd卡
-     */
-    private void setPicToView(Bitmap mBitmap) {
-        String sdStatus = Environment.getExternalStorageState();
-        if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) { // 检测sd是否可用
-            return;
-        }
-        FileOutputStream b = null;
-        File file = new File(mPath);
-        file.mkdirs();// 创建文件夹
-        String fileName = mPath + mFilename;//图片名字
-        try {
-            b = new FileOutputStream(fileName);
-            mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);// 把数据写入文件
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                //关闭流
-                b.flush();
-                b.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private Bitmap decodeUriAsBitmap(Uri uri) {
