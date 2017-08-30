@@ -16,7 +16,7 @@
         android:background="#ffffff"
         android:gravity="center"
         android:text="拍照"
-        android:textColor="#3ecc1c"
+        android:textColor="#FF212020"
         android:textSize="18sp"/>
 
     <View
@@ -36,7 +36,7 @@
         android:background="#ffffff"
         android:gravity="center"
         android:text="从相册选择"
-        android:textColor="#3ecc1c"
+        android:textColor="#FF212020"
         android:textSize="18sp"/>
 
     <View
@@ -56,7 +56,7 @@
         android:background="#ffffff"
         android:gravity="center"
         android:text="取消"
-        android:textColor="#3ecc1c"
+        android:textColor="#FF212020"
         android:textSize="18sp"/>
 
 </LinearLayout>
