@@ -78,7 +78,7 @@ public class PayAction extends IPluginAction {
     }
 
     private void orderPay(String type, final String orderInfo) {
-        if (PAY_TYPE_ALIPAY.endsWith(type)) {
+        if (PAY_TYPE_ALIPAY.equals(type)) {
             Runnable payRunnable = new Runnable() {
 
                 @Override
