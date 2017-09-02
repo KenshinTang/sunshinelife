@@ -646,3 +646,6 @@ img{
 .tabs-md .tab-button[aria-selected=true] .tab-button-icon {
   color: #FD832F;
 }
+.select-ios .select-icon .select-icon-inner, .select-md .select-icon .select-icon-inner{
+  left: 2px !important;
+}

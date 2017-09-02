@@ -1,7 +1,7 @@
 /*全局配置*/
 var Config={
 	root:'http://39.108.54.14:8080/ygsh/',//接口根路径url
-	ossroot:'http://ygsh.oss-cn-shenzhen.aliyuncs.com/',//oss根路径
+	ossroot:'https://ygsh.oss-cn-shenzhen.aliyuncs.com/',//oss根路径
   pagesize:10,
   isApp: true
 };
@@ -9,6 +9,20 @@ var Config={
 var AJAX={
   url:function(){return "http://39.108.54.14:8080/ygsh/"},
   get:function(api, obj, cb, err){
+    var user = CommonFunction.get("user");
+    if (user) {
+      obj.appid = user.appid;
+      obj.timestamp = user.timestamp;
+      obj = this.objKeySort(obj);
+      obj.token = user.token;
+      var arr1 = [];
+      for (var i in obj) {
+        arr1.push(i + "=" + obj[i]);
+      }
+      obj.sign = hex_md5(arr1.join("&")).toUpperCase();
+      delete obj.token;
+    }
+
     $.ajax({
       type: "get",
       url:AJAX.url()+api,
@@ -19,10 +33,11 @@ var AJAX={
         if(a.code == 1) {
           cb&&cb(a.data);
         } else if (a.code == 110) {
+          err&&err("该账号已在其他地方登录", 110);
           //CommonFunction.remove('user');
           //CommonFunction.remove('__utoken');
           //Comm.gotop("login.html");
-          //Comm.message("该账号已在其他地方登录");
+          //Comm.message("");
         } else {
           err&&err(a.msg);
         }
@@ -33,6 +48,20 @@ var AJAX={
     });
   },
   post:function(api, obj, cb, err){
+    var user = CommonFunction.get("user");
+    if (user) {
+      obj.appid = user.appid;
+      obj.timestamp = user.timestamp;
+      obj = this.objKeySort(obj);
+      obj.token = user.token;
+      var arr1 = [];
+      for (var i in obj) {
+        arr1.push(i + "=" + obj[i]);
+      }
+      obj.sign = hex_md5(arr1.join("&")).toUpperCase();
+      delete obj.token;
+    }
+
     $.ajax({
       type: "post",
       url:AJAX.url()+api,
@@ -56,6 +85,15 @@ var AJAX={
       },
     });
   },
+  objKeySort: function(obj) {//排序的函数
+    var newkey = Object.keys(obj).sort();
+    //先用Object内置类的keys方法获取要排序对象的属性名，再利用Array原型上的sort方法对获取的属性名进行排序，newkey是一个数组
+    var newObj = {};//创建一个新的对象，用于存放排好序的键值对
+    for (var i = 0; i < newkey.length; i++) {//遍历newkey数组
+      newObj[newkey[i]] = obj[newkey[i]];//向新创建的对象中按照排好的顺序依次增加键值对
+    }
+    return newObj;//返回排好序的新对象
+  }
 };
 
 var CommonFunction = {
@@ -256,6 +294,14 @@ var CommonFunction = {
     }
     return returndata;
   },
+  removeEmoji: function(id) {
+    var regStr = /[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF][\u200D|\uFE0F]|[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF]|[0-9|*|#]\uFE0F\u20E3|[0-9|#]\u20E3|[\u203C-\u3299]\uFE0F\u200D|[\u203C-\u3299]\uFE0F|[\u2122-\u2B55]|\u303D|[\A9|\AE]\u3030|\uA9|\uAE|\u3030/ig;
+    var org_val = $("#" + id).val().toString();
+
+    if(regStr.test(org_val)){
+      $("#" + id).val(org_val.replace(regStr,""));
+    }
+  }
 };
 
 
