@@ -46,6 +46,7 @@ public class PayAction extends IPluginAction {
         String orderId = jsonObject.optString("orderId");
         Log.i(TAG, "type[1、支付宝app ;2、支付宝即时到账；3、微信app;4、微信公众号;5、微信扫码]:" + type + ", orderId:" + orderId);
 
+        // 通过订单号跑订单接口信息接口获取订单信息, 然后再根据订单信息下单支付.
         getOrderInfo(type, orderId);
     }
 

@@ -18,6 +18,7 @@ import com.umeng.socialize.utils.ContextUtil;
  * Created by YX on 2017/8/19.
  * 18011613272   111222
  * 18011613271   111222
+ * 18683253663   qazwsx
  */
 
 public class YunApplication extends Application {
