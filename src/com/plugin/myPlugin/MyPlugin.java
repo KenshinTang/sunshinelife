@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -108,11 +107,13 @@ public class MyPlugin extends CordovaPlugin {
         addPermission(permissionList, Manifest.permission.CALL_PHONE);
         addPermission(permissionList, Manifest.permission.CAMERA);
         //屏蔽掉的权限无法申请，待查看影响及原因。
-//        addPermission(permissionList, Manifest.permission.READ_LOGS);
-//        addPermission(permissionList, Manifest.permission.SET_DEBUG_APP);
-//        addPermission(permissionList, Manifest.permission.SYSTEM_ALERT_WINDOW);
-//        addPermission(permissionList, Manifest.permission.GET_ACCOUNTS);
-//        addPermission(permissionList, Manifest.permission.WRITE_APN_SETTINGS);
+        addPermission(permissionList, Manifest.permission.READ_LOGS);
+        addPermission(permissionList, Manifest.permission.SET_DEBUG_APP);
+        addPermission(permissionList, Manifest.permission.GET_ACCOUNTS);
+        //此2种权限比较特殊，如果要申请，需要跳到设置界面中打开。
+        // Settings.ACTION_MANAGE_OVERLAY_PERMISSIO、Settings.ACTION_MANAGE_WRITE_SETTINGS
+//      addPermission(permissionList, Manifest.permission.SYSTEM_ALERT_WINDOW);
+//      addPermission(permissionList, Manifest.permission.WRITE_APN_SETTINGS);
         if (!permissionList.isEmpty()) {
             String[] permissions = permissionList.toArray(new String[permissionList.size()]);
             cordova.requestPermissions(this, 1, permissions);
@@ -123,7 +124,7 @@ public class MyPlugin extends CordovaPlugin {
     }
 
     private void addPermission(List<String> permissionList, String permission) {
-        if (ContextCompat.checkSelfPermission(mActivity, permission) != PackageManager.PERMISSION_GRANTED) {
+        if (cordova.hasPermission(permission)) {
             permissionList.add(permission);
         }
     }
