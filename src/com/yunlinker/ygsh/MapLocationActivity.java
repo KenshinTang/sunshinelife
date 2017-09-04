@@ -5,12 +5,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -30,7 +26,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -59,7 +54,6 @@ import com.baidu.mapapi.search.poi.PoiResult;
 import com.baidu.mapapi.search.poi.PoiSearch;
 import com.google.gson.Gson;
 import com.plugin.myPlugin.bean.LocationBean;
-import com.yunlinker.ygsh.util.ToastUtil;
 import com.yunlinker.ygsh.view.SearchEditView;
 
 import java.util.ArrayList;
@@ -73,6 +67,7 @@ import java.util.List;
  */
 public class MapLocationActivity extends Activity implements OnGetPoiSearchResultListener, BaiduMap.OnMapStatusChangeListener {
 
+    public static final String TAG = "allen";
     /**
      * 定位SDK的核心类
      */
@@ -94,7 +89,6 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
     private ListView mSearchPoisList;
     private RelativeLayout mapHeadView;
     private RelativeLayout mapLayout;
-    private String TAG = "allen";
     private SDKReceiver mReceiver;
     private int checkPosition;
     //搜索editText
@@ -122,7 +116,6 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_baidumap);
         mContext = this;
-
         // 注册 SDK 广播监听者
         IntentFilter iFilter = new IntentFilter();
         iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK);
@@ -130,53 +123,9 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
         iFilter.addAction(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR);
         mReceiver = new SDKReceiver();
         registerReceiver(mReceiver, iFilter);
-
         initView();
         initEvent();
-
-        checkPermission();
-    }
-
-    private void checkPermission() {
-        List<String> permissionList = new ArrayList<>();
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            permissionList.add(android.Manifest.permission.ACCESS_FINE_LOCATION);
-        }
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            permissionList.add(android.Manifest.permission.READ_PHONE_STATE);
-        }
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            permissionList.add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        }
-        if (!permissionList.isEmpty()) {
-            String[] permissions = permissionList.toArray(new String[permissionList.size()]);
-            ActivityCompat.requestPermissions(this, permissions, 1);
-        } else {
-            initLocation();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case 1:
-                if (grantResults.length > 0) {
-                    for (int result : grantResults) {
-                        if (result != PackageManager.PERMISSION_GRANTED) {
-                            Toast.makeText(this, "必须同意所有权限才能使用本程序", Toast.LENGTH_SHORT).show();
-                            finish();
-                            return;
-                        }
-                    }
-                    initLocation();
-                } else {
-                    Toast.makeText(this, "发生未知错误", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-                break;
-            default:
-        }
+        initLocation();
     }
 
     private void hideMapView() {
@@ -287,22 +236,13 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
             View v = getCurrentFocus();
-
             if (isShouldHideKeyboard(v, ev)) {
                 hideKeyboard(v.getWindowToken());
             }
         }
-
         return super.dispatchTouchEvent(ev);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Log.d(TAG, "onBackPress");
     }
 
     private void hideKeyboard(IBinder token) {
@@ -341,7 +281,6 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
      */
     private void initEvent() {
         mSearchResultList.setOnItemClickListener(new OnItemClickListener() {
-
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
@@ -359,17 +298,13 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
                 finish();
             }
         });
-
         mRequestLocation.setOnClickListener(new OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 initLocation();
             }
         });
-
         mSendButton.setOnClickListener(new OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 Object item = mListAdapter.getItem(checkPosition);
@@ -394,7 +329,6 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
                 finish();
             }
         });
-
     }
 
     /**
@@ -404,7 +338,6 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
         //重新设置
         checkPosition = 0;
         mListAdapter.setCheckPosition(0);
-
         mBaiduMap = mMapView.getMap();
         mBaiduMap.clear();
         // 开启定位图层
@@ -431,25 +364,20 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
         reverseCoder.location(target);
         Log.d(TAG, "searchMoveFinish: ");
         geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
-
             @Override
             public void onGetReverseGeoCodeResult(ReverseGeoCodeResult arg0) {
-                Log.d(TAG, "onGetReverseGeoCodeResult: 111");
                 if (arg0 != null && arg0.getPoiList() != null) {
                     mListAdapter.setData(arg0.getPoiList());
                     mSearchResultList.setAdapter(mListAdapter);
                     mListAdapter.notifyDataSetChanged();
-                } else {
-                    ToastUtil.show(mContext, "没有更多了！");
                 }
             }
 
             @Override
-            public void onGetGeoCodeResult(GeoCodeResult arg0) { //
-                Log.d(TAG, "onGetReverseGeoCodeResult: 111");
+            public void onGetGeoCodeResult(GeoCodeResult arg0) {
             }
         });
-        geoCoder.reverseGeoCode(reverseCoder); //
+        geoCoder.reverseGeoCode(reverseCoder);
     }
 
     /*
@@ -460,8 +388,6 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
         if (poiResult != null && poiResult.getAllPoi() != null) {
             mListAdapter.setData(poiResult.getAllPoi());
             mListAdapter.notifyDataSetChanged();
-        } else {
-            ToastUtil.show(mContext, "没有更多了！");
         }
         mListAdapter.setCheckPosition(0);
     }
@@ -482,14 +408,12 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
         if (mLocationClient != null) {
             mLocationClient.stop();
         }
-
         // 关闭定位图层
         mBaiduMap.setMyLocationEnabled(false);
         mPoiSearch.destroy();
         super.onDestroy();
         // 在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
         mMapView.onDestroy();
-
         // 取消监听 SDK 广播
         unregisterReceiver(mReceiver);
     }
@@ -512,17 +436,16 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
      * 构造广播监听类，监听 SDK key 验证以及网络异常广播
      */
     public class SDKReceiver extends BroadcastReceiver {
-
         public void onReceive(Context context, Intent intent) {
             String s = intent.getAction();
             if (s.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR)) {
-                Log.d("allen", "key 验证出错! 错误码 :" + intent.getIntExtra
+                Log.d(TAG, "key 验证出错! 错误码 :" + intent.getIntExtra
                         (SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_CODE, 0)
                         + " ; 请在 AndroidManifest.xml 文件中检查 key 设置");
             } else if (s.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK)) {
-                Log.d("allen", "key 验证成功! 功能可以正常使用");
+                Log.d(TAG, "key 验证成功! 功能可以正常使用");
             } else if (s.equals(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR)) {
-                Log.d("allen", "网络出错");
+                Log.d(TAG, "网络出错");
             }
         }
     }
@@ -542,7 +465,6 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
             if (location.hasRadius()) {// 判断是否有定位精度半径
                 radius = location.getRadius();
             }
-
             if (locType == BDLocation.TypeNetWorkLocation) {
                 addrStr = location.getAddrStr();// 获取反地理编码(文字描述的地址)
             }
@@ -555,9 +477,7 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
                     .direction(100).latitude(location.getLatitude())
                     .longitude(location.getLongitude()).build();
             mBaiduMap.setMyLocationData(locData);
-
             mMapView.showZoomControls(false);
-
             // 创建POI检索实例
             mPoiSearch = PoiSearch.newInstance();
             // 设置监听器
@@ -618,11 +538,9 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
                 holder.textAddress = (TextView) convertView.findViewById(R.id.text_address);
                 holder.imageLl = (ImageView) convertView.findViewById(R.id.image);
                 convertView.setTag(holder);
-
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
-
             holder.textView.setText(dataList.get(position).name);
             holder.textAddress.setText(dataList.get(position).address);
             if (checkPosition == position) {
@@ -630,11 +548,8 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
             } else {
                 holder.imageLl.setVisibility(View.GONE);
             }
-
-
             return convertView;
         }
-
     }
 
     class ViewHolder {
@@ -644,7 +559,6 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
     }
 
     private class PoiSearchAdapter extends BaseAdapter {
-
         private Context context;
         private List<PoiInfo> poiInfos = new ArrayList<>();
 

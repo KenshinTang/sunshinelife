@@ -44,19 +44,19 @@ public class LoginAction extends IPluginAction {
 
         switch (loginType) {
             case LOGINTYPE_WECHAT:
-//                MobAuthorize(new Wechat(), callbackContext);
-                UmengAuthorize(plugin.cordova.getActivity(), SHARE_MEDIA.WEIXIN, callbackContext);
+//                mobAuthorize(new Wechat(), callbackContext);
+                umengAuthorize(plugin.cordova.getActivity(), SHARE_MEDIA.WEIXIN, callbackContext);
                 break;
             case LOGINTYPE_QQ:
-//                MobAuthorize(new QQ(), callbackContext);
-                UmengAuthorize(plugin.cordova.getActivity(), SHARE_MEDIA.QQ, callbackContext);
+//                mobAuthorize(new QQ(), callbackContext);
+                umengAuthorize(plugin.cordova.getActivity(), SHARE_MEDIA.QQ, callbackContext);
                 break;
             default:
                 break;
         }
     }
 
-    private void UmengAuthorize(Activity context, SHARE_MEDIA shareMedia, final CallbackContext callbackContext) {
+    private void umengAuthorize(Activity context, SHARE_MEDIA shareMedia, final CallbackContext callbackContext) {
         UMShareAPI umShareAPI = UMShareAPI.get(context);
         umShareAPI.getPlatformInfo(context, shareMedia, new UMAuthListener() {
             @Override
@@ -117,7 +117,7 @@ public class LoginAction extends IPluginAction {
         });
     }
 
-    private void MobAuthorize(Platform platform, final CallbackContext callbackContext) {
+    private void mobAuthorize(Platform platform, final CallbackContext callbackContext) {
         String userId = platform.getDb().getUserId();
         if (!TextUtils.isEmpty(userId)) {
             platform.removeAccount(true);

@@ -1,16 +1,12 @@
 package com.plugin.myPlugin.factory;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -98,14 +94,7 @@ public class UploadImgAction extends IPluginAction {
         takePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Android 6.0 需要检查权限 ，对于没有权限的需要先申请权限
-                if (ContextCompat.checkSelfPermission(plugin.cordova.getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    //申请拍照权限
-                    ActivityCompat.requestPermissions(plugin.cordova.getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA_CODE);
-                } else {
-                    //拍照
-                    takePhoto();
-                }
+                takePhoto();
             }
         });
         TextView selectFromAlbum = (TextView) view.findViewById(R.id.select_from_album);
@@ -139,11 +128,6 @@ public class UploadImgAction extends IPluginAction {
                 if (imageUri != null) {
                     Bitmap bitmap = decodeUriAsBitmap(imageUri);
                     if (bitmap != null) {
-                        //Android 6.0 需要检查权限 ，对于没有权限的需要先申请权限
-                        if (ContextCompat.checkSelfPermission(mPlugin.cordova.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                            //申请拍照权限
-                            ActivityCompat.requestPermissions(mPlugin.cordova.getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_STORAGE_CODE);
-                        }
                         uploadPic();
                     }
                 }
@@ -210,7 +194,6 @@ public class UploadImgAction extends IPluginAction {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-
                         PutObjectRequest put = new PutObjectRequest("ygsh", imgName, imageUri.getPath());
                         OSSAsyncTask task = oss.asyncPutObject(put, new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
                             @Override
@@ -255,29 +238,6 @@ public class UploadImgAction extends IPluginAction {
             });
         } catch (JSONException e) {
             e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_CAMERA_CODE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //权限申请成功
-                    takePhoto();
-                } else {
-                    //权限申请失败
-                }
-            }
-            break;
-            case MY_PERMISSIONS_REQUEST_STORAGE_CODE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //权限申请成功
-                    uploadPic();
-                } else {
-                    //权限申请失败
-                }
-            }
         }
     }
 
