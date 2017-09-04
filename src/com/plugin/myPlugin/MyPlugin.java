@@ -1,7 +1,13 @@
 package com.plugin.myPlugin;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.plugin.myPlugin.factory.IPluginAction;
 import com.plugin.myPlugin.factory.PluginActionFactory;
@@ -12,12 +18,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This class echoes a string called from JavaScript.
  */
 public class MyPlugin extends CordovaPlugin {
     private static final String TAG = "MyPlugin";
     private IPluginAction mPluginAction;
+    IPluginAction mPluginAction;
+    private Activity mActivity;
+    private JSONObject mJsonObject;
+    private CallbackContext mCallbackContext;
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -25,18 +38,20 @@ public class MyPlugin extends CordovaPlugin {
             return false;
         }
         Log.i(TAG, "Plugin execute action = " + action + " , args = " + args.toString());
-        JSONObject jsonObject = null;
         try {
-            jsonObject = args.getJSONObject(0);
+            mJsonObject = args.getJSONObject(0);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         mPluginAction = PluginActionFactory.createPluginAction(action);
         if (mPluginAction == null) {
             return false;
         }
-        mPluginAction.doAction(this, jsonObject, callbackContext);
+        mActivity = this.cordova.getActivity();
+        if (!checkPermission()) {
+            mCallbackContext = callbackContext;
+            mPluginAction.doAction(this, mJsonObject, mCallbackContext);
+        }
         return true;
     }
 
@@ -47,7 +62,6 @@ public class MyPlugin extends CordovaPlugin {
             mPluginAction.onActivityResult(requestCode, resultCode, intent);
         }
         super.onActivityResult(requestCode, resultCode, intent);
-
     }
 
     /**
@@ -60,11 +74,57 @@ public class MyPlugin extends CordovaPlugin {
      */
     @Override
     public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
+        Log.i(TAG, "onRequestPermissionResult: requestCode" + requestCode);
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 0) {
+                    for (int result : grantResults) {
+                        if (result != PackageManager.PERMISSION_GRANTED) {
+                            Toast.makeText(mActivity, "必须同意所有权限才能正常使用本程序", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+                    mPluginAction.doAction(this, mJsonObject, mCallbackContext);
+                } else {
+                    Toast.makeText(mActivity, "发生未知错误", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+        }
         if (mPluginAction != null) {
             mPluginAction.onRequestPermissionResult(requestCode, permissions, grantResults);
         }
         super.onRequestPermissionResult(requestCode, permissions, grantResults);
     }
 
+    private boolean checkPermission() {
+        if (Build.VERSION.SDK_INT < 23) {
+            return false;
+        }
+        List<String> permissionList = new ArrayList<>();
+        addPermission(permissionList, Manifest.permission.ACCESS_FINE_LOCATION);
+        addPermission(permissionList, Manifest.permission.READ_PHONE_STATE);
+        addPermission(permissionList, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        addPermission(permissionList, Manifest.permission.CALL_PHONE);
+        addPermission(permissionList, Manifest.permission.CAMERA);
+        //屏蔽掉的权限无法申请，待查看影响及原因。
+//        addPermission(permissionList, Manifest.permission.READ_LOGS);
+//        addPermission(permissionList, Manifest.permission.SET_DEBUG_APP);
+//        addPermission(permissionList, Manifest.permission.SYSTEM_ALERT_WINDOW);
+//        addPermission(permissionList, Manifest.permission.GET_ACCOUNTS);
+//        addPermission(permissionList, Manifest.permission.WRITE_APN_SETTINGS);
+        if (!permissionList.isEmpty()) {
+            String[] permissions = permissionList.toArray(new String[permissionList.size()]);
+            cordova.requestPermissions(this, 1, permissions);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
+    private void addPermission(List<String> permissionList, String permission) {
+        if (ContextCompat.checkSelfPermission(mActivity, permission) != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(permission);
+        }
+    }
 }

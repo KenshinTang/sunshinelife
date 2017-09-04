@@ -1,8 +1,5 @@
 package com.plugin.myPlugin.factory;
 
-import android.Manifest;
-import android.os.Build;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.plugin.myPlugin.utils.JsonWrapUtils;
@@ -39,38 +36,18 @@ public class ShareAction extends IPluginAction {
         String imagePath = jsonObject.optString("pic");
         String desc = jsonObject.optString("desc");
         String url = jsonObject.optString("url");
-
         Log.i(TAG, "show Share [title:" + title + ", imagePath:" + imagePath + ", desc:" + desc + ", url:" + url + "]");
-
         //友盟分享
         showUmengShare(plugin.cordova, title, url, desc, imagePath, callbackContext);
-
         //Mob分享
 //        showOnekeyShare(cordova, title, url, desc, imagePath, callbackContext);
     }
 
     private void showUmengShare(CordovaInterface cordova, String title, String url, String desc, String imagePath, final CallbackContext callbackContext) {
-        //UMeng分享的SDK版本适配, 动态申请权限
-        if (Build.VERSION.SDK_INT >= 23) {
-            String[] mPermissionList = new String[]{
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.CALL_PHONE,
-                    Manifest.permission.READ_LOGS,
-                    Manifest.permission.READ_PHONE_STATE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.SET_DEBUG_APP,
-                    Manifest.permission.SYSTEM_ALERT_WINDOW,
-                    Manifest.permission.GET_ACCOUNTS,
-                    Manifest.permission.WRITE_APN_SETTINGS};
-            ActivityCompat.requestPermissions(cordova.getActivity(), mPermissionList, 123);
-        }
-
-        UMWeb  web = new UMWeb(url);
+        UMWeb web = new UMWeb(url);
         web.setTitle(title);//标题
         web.setThumb(new UMImage(cordova.getActivity(), imagePath));
         web.setDescription(desc);//描述
-
         new com.umeng.socialize.ShareAction(cordova.getActivity())
                 .withMedia(web)
                 .setDisplayList(SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE, SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE)
@@ -126,7 +103,6 @@ public class ShareAction extends IPluginAction {
         OnekeyShare oks = new OnekeyShare();
         //关闭sso授权
         oks.disableSSOWhenAuthorize();
-
         // title标题，印象笔记、邮箱、信息、微信、人人网和QQ空间等使用
         oks.setTitle(title);
         // titleUrl是标题的网络链接，QQ和QQ空间等使用
@@ -143,7 +119,6 @@ public class ShareAction extends IPluginAction {
 //            oks.setSite(cordova.getActivity().getString(R.string.app_name));
         // siteUrl是分享此内容的网站地址，仅在QQ空间使用
 //            oks.setSiteUrl("http://sharesdk.cn");
-
         oks.setCallback(new PlatformActionListener() {
             @Override
             public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
@@ -184,7 +159,6 @@ public class ShareAction extends IPluginAction {
                 }
             }
         });
-
         // 启动分享GUI
         oks.show(cordova.getActivity());
     }
