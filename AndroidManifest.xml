@@ -123,6 +123,11 @@
             android:exported="true"
             android:screenOrientation="portrait" />
 
+        <!--微信支付回调 -->
+        <activity android:name="com.yunlinker.ygsh.wxapi.WXPayEntryActivity"
+            android:exported="true"
+            android:launchMode="singleTop"/>
+
 
         <activity
             android:name="com.alipay.sdk.app.H5PayActivity"

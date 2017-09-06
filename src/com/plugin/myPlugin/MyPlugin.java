@@ -17,7 +17,7 @@ import org.json.JSONObject;
  */
 public class MyPlugin extends CordovaPlugin {
     private static final String TAG = "MyPlugin";
-    IPluginAction mPluginAction;
+    private IPluginAction mPluginAction;
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {

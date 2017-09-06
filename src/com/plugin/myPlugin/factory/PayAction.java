@@ -1,7 +1,9 @@
 package com.plugin.myPlugin.factory;
 
-import android.os.Handler;
-import android.os.Message;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -34,11 +36,22 @@ import okhttp3.Response;
 public class PayAction extends IPluginAction {
     private static final String TAG = "PayAction";
 
+    public static final String ACTION_WECHAT_CALLBACK = "ACTION_WECHAT_CALLBACK";
+
     private static final String PAY_TYPE_ALIPAY = "1";  //支付宝app
     private static final String PAY_TYPE_WECHAT = "3";  //微信app
 
     private CordovaPlugin mPlugin;
     private CallbackContext mCallbackContext;
+
+    private BroadcastReceiver mWechatPayCallbackReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ACTION_WECHAT_CALLBACK.equals(intent.getAction())) {
+                payCallback(0 == intent.getIntExtra("pay_result", -1));
+            }
+        }
+    };
 
     @Override
     public void doAction(CordovaPlugin plugin, JSONObject jsonObject, CallbackContext callbackContext) {
@@ -48,6 +61,8 @@ public class PayAction extends IPluginAction {
         String type = jsonObject.optString("type");
         String orderId = jsonObject.optString("orderId");
         Log.i(TAG, "type[1、支付宝app ;2、支付宝即时到账；3、微信app;4、微信公众号;5、微信扫码]:" + type + ", orderId:" + orderId);
+
+        mPlugin.cordova.getActivity().registerReceiver(mWechatPayCallbackReceiver, new IntentFilter(ACTION_WECHAT_CALLBACK));
 
         // 通过订单号跑订单接口信息接口获取订单信息, 然后再根据订单信息下单支付.
         getOrderInfo(type, orderId);
@@ -95,27 +110,9 @@ public class PayAction extends IPluginAction {
 
                     PayResult payResult = new PayResult(result);
                     String resultStatus = payResult.getResultStatus();
-                    if (TextUtils.equals(resultStatus, "9000")) {
-                        // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
-                        try {
-                            JSONObject jsonObject = new JSONObject();
-                            jsonObject.put("code", "1");
-                            jsonObject.put("msg", "支付成功");
-                            mCallbackContext.success(jsonObject);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
-                        try {
-                            JSONObject jsonObject = new JSONObject();
-                            jsonObject.put("code", "0");
-                            jsonObject.put("msg", "支付失败");
-                            mCallbackContext.error(jsonObject);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
+
+                    //支付结果的回调
+                    payCallback(TextUtils.equals(resultStatus, "9000"));
                 }
             };
             // 必须异步调用
@@ -171,6 +168,21 @@ public class PayAction extends IPluginAction {
                 e.printStackTrace();
             }
 
+        }
+    }
+
+    private void payCallback(boolean success) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("code", success ? "1" : "0");
+            jsonObject.put("msg", success ? "支付成功" : "支付失败");
+            if (success) {
+                mCallbackContext.success(jsonObject);
+            } else {
+                mCallbackContext.error(jsonObject);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 }
