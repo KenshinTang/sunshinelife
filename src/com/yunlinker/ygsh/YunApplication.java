@@ -54,7 +54,7 @@ public class YunApplication extends Application {
         //分享和登录的SDK
         Config.DEBUG = true;
         ContextUtil.setContext(this);
-        PlatformConfig.setWeixin("", "");
+        PlatformConfig.setWeixin("wxd3769510490f1c98", "210b2c1a2208a804adeda8b14ee5dcb7");
         PlatformConfig.setQQZone("1105543710", "WcTA1g0pEeT50ccg");
 
         //消息推送的SDK

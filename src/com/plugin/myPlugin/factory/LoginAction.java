@@ -40,7 +40,6 @@ public class LoginAction extends IPluginAction {
     public void doAction(CordovaPlugin plugin, JSONObject jsonObject, CallbackContext callbackContext) {
         int loginType = jsonObject.optInt("type");
         Log.i(TAG, "login type[1:wechat, 2:QQ] = " + loginType);
-        loginType = LOGINTYPE_QQ;
 
         switch (loginType) {
             case LOGINTYPE_WECHAT:
