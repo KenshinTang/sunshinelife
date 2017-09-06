@@ -16,6 +16,7 @@ public class PluginActionFactory {
         Properties.addProperties("getPushTokenMethod", "com.plugin.myPlugin.factory.GetPushTokenAction"); //获取推送token
         Properties.addProperties("coolMethod", "com.plugin.myPlugin.factory.TestAction");//test
         Properties.addProperties("getLatLngMethod", "com.plugin.myPlugin.factory.GetLocationAction");//获取经纬度
+        Properties.addProperties("navigationMethod", "com.plugin.myPlugin.factory.NavigationAction");//导航
     }
 
     public static IPluginAction createPluginAction(String action) {
