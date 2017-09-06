@@ -84,3 +84,11 @@ http://39.108.54.14:8080/ygsh/doc.html
 	//参数说明：act=get，获取当前推荐状态；act=set:设置推荐状态，状态值：0为关闭，1为打开
 		结果：act=get,返回当前状态（0，1）；act=set,返回是否设置成功（0，1）
 		返回：结果,code
+
+9.导航
+	exec(success, error, "MyPlugin", "navigationMethod", [arg0]);
+
+	arg0 : {“addr”: 地址，“lat”:”纬度” , “lng”: “经度”}
+
+	回调 : {"code":1成功,0失败，"msg":"描述”}
+	进入第三方导航, 如果用户没有安装, 进入网页导航

@@ -505,6 +505,10 @@ img{
 .gF7F6F2{
   background:#F7F6F2;
 }
+.codeColor{
+  border: 1px solid #D5D5D5 !important;
+  color: #D5D5D5 !important;
+}
 /*@font-face {*/
 /*font-family: 'yaheinoB';   !*字体名称*!*/
 /*src: url('../upfile/font/yaheinoB.ttf');       !*字体源文件*!*/
