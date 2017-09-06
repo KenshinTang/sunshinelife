@@ -6,6 +6,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.alipay.sdk.app.PayTask;
+import com.tencent.mm.opensdk.modelpay.PayReq;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -66,7 +69,9 @@ public class PayAction extends IPluginAction {
                 String result = response.body().string();
                 Log.i(TAG, "get payInfo : " + result);
                 // {"code":1,"msg":"",
-                // "data":"alipay_sdk=alipay-sdk-java-dynamicVersionNo&app_id=2017082308344253&biz_content=%7B%22body%22%3A%22%E9%98%B3%E5%85%89%E7%94%9F%E6%B4%BB%22%2C%22out_trade_no%22%3A%22170902195910002%22%2C%22product_code%22%3A%22QUICK_MSECURITY_PAY%22%2C%22subject%22%3A%22%E9%98%B3%E5%85%89%E7%94%9F%E6%B4%BB%22%2C%22timeout_express%22%3A%2230m%22%2C%22total_amount%22%3A%220.01%22%7D&charset=utf-8&format=json&method=alipay.trade.app.pay&notify_url=http%3A%2F%2F39.108.54.14%3A8080%2Fygsh%2Fapi%2Fpay%2FaliPayResult&sign=eaUjQ6kXX93IVWNX6eSazA5DDpe%2BML7Yqa%2BrY9gtHjEtxtAhPo2HcDnIDF1TaqsQP2r2ClsstvUsB4ZD5f6LyPkuD3u8KMrUyVKa%2FcxxX3veVLPQdzZsDr2H8KZ39iIb88rgtfbN3LeDUJ1RSSHhJtg%2F%2FMm3ScbZMemnbCUnK9oC40ojYK58Mm1fPxjjtw14panrM%2FNd6DnLFohEuz7ZxfzeIyE03%2BSJ3Zojv4EUj6X6ynxWoVuAvFk4OG7HokKP8c3kyp2Mq6N5c73dThef%2B8JlR1wTHqtDLo4h5IjTPEs5eL9XgKOUs5XkjoOFqLoNTtQF97tG6UEN4g23e%2F84Ug%3D%3D&sign_type=RSA2&timestamp=2017-09-02+19%3A59%3A15&version=1.0&sign=eaUjQ6kXX93IVWNX6eSazA5DDpe%2BML7Yqa%2BrY9gtHjEtxtAhPo2HcDnIDF1TaqsQP2r2ClsstvUsB4ZD5f6LyPkuD3u8KMrUyVKa%2FcxxX3veVLPQdzZsDr2H8KZ39iIb88rgtfbN3LeDUJ1RSSHhJtg%2F%2FMm3ScbZMemnbCUnK9oC40ojYK58Mm1fPxjjtw14panrM%2FNd6DnLFohEuz7ZxfzeIyE03%2BSJ3Zojv4EUj6X6ynxWoVuAvFk4OG7HokKP8c3kyp2Mq6N5c73dThef%2B8JlR1wTHqtDLo4h5IjTPEs5eL9XgKOUs5XkjoOFqLoNTtQF97tG6UEN4g23e%2F84Ug%3D%3D","totalCount":0,"curPage":0,"pageSize":0,"success":true}
+                // "data":"alipay_sdk=alipay-sdk-java-dynamicVersionNo&
+                // app_id=2017082308344253&
+                // biz_content=%7B%22body%22%3A%22%E9%98%B3%E5%85%89%E7%94%9F%E6%B4%BB%22%2C%22out_trade_no%22%3A%22170902195910002%22%2C%22product_code%22%3A%22QUICK_MSECURITY_PAY%22%2C%22subject%22%3A%22%E9%98%B3%E5%85%89%E7%94%9F%E6%B4%BB%22%2C%22timeout_express%22%3A%2230m%22%2C%22total_amount%22%3A%220.01%22%7D&charset=utf-8&format=json&method=alipay.trade.app.pay&notify_url=http%3A%2F%2F39.108.54.14%3A8080%2Fygsh%2Fapi%2Fpay%2FaliPayResult&sign=eaUjQ6kXX93IVWNX6eSazA5DDpe%2BML7Yqa%2BrY9gtHjEtxtAhPo2HcDnIDF1TaqsQP2r2ClsstvUsB4ZD5f6LyPkuD3u8KMrUyVKa%2FcxxX3veVLPQdzZsDr2H8KZ39iIb88rgtfbN3LeDUJ1RSSHhJtg%2F%2FMm3ScbZMemnbCUnK9oC40ojYK58Mm1fPxjjtw14panrM%2FNd6DnLFohEuz7ZxfzeIyE03%2BSJ3Zojv4EUj6X6ynxWoVuAvFk4OG7HokKP8c3kyp2Mq6N5c73dThef%2B8JlR1wTHqtDLo4h5IjTPEs5eL9XgKOUs5XkjoOFqLoNTtQF97tG6UEN4g23e%2F84Ug%3D%3D&sign_type=RSA2&timestamp=2017-09-02+19%3A59%3A15&version=1.0&sign=eaUjQ6kXX93IVWNX6eSazA5DDpe%2BML7Yqa%2BrY9gtHjEtxtAhPo2HcDnIDF1TaqsQP2r2ClsstvUsB4ZD5f6LyPkuD3u8KMrUyVKa%2FcxxX3veVLPQdzZsDr2H8KZ39iIb88rgtfbN3LeDUJ1RSSHhJtg%2F%2FMm3ScbZMemnbCUnK9oC40ojYK58Mm1fPxjjtw14panrM%2FNd6DnLFohEuz7ZxfzeIyE03%2BSJ3Zojv4EUj6X6ynxWoVuAvFk4OG7HokKP8c3kyp2Mq6N5c73dThef%2B8JlR1wTHqtDLo4h5IjTPEs5eL9XgKOUs5XkjoOFqLoNTtQF97tG6UEN4g23e%2F84Ug%3D%3D","totalCount":0,"curPage":0,"pageSize":0,"success":true}
                 try {
                     JSONObject jsonObject = new JSONObject(result);
                     String orderInfo = jsonObject.getString("data");
@@ -116,6 +121,56 @@ public class PayAction extends IPluginAction {
             // 必须异步调用
             Thread payThread = new Thread(payRunnable);
             payThread.start();
+        } else if (PAY_TYPE_WECHAT.equals(type)) {
+            //{
+            //    code: 1,
+            //            msg: "",
+            //        data: {
+            //        package: "Sign=WXPay",
+            //            code_url: null,
+            //            appid: "wxd46fd7b11f8fb67f",
+            //            sign: "EF012B1F3105C54758EBA499C9745FB1",
+            //            partnerid: "1487000552",
+            //            prepayid: "wx201709061843592bc717819e0114385436",
+            //            noncestr: "xew02va77hxcf1isoa16vakb8c2avvly",
+            //            timestamp: 1504694639
+            //          },
+            //    totalCount: 0,
+            //            curPage: 0,
+            //        pageSize: 0,
+            //        success: true
+            //}
+            Log.i(TAG, "get payResult" + orderInfo);
+            try {
+                JSONObject jsonObject = new JSONObject(orderInfo);
+
+                String appId = jsonObject.getString("appid");
+                String partnerId = jsonObject.getString("partnerid");
+                String prepayId = jsonObject.getString("prepayid");
+                String packageValue = jsonObject.getString("package");
+                String nonceStr = jsonObject.getString("noncestr");
+                String timestamp = jsonObject.getString("timestamp");
+                String sign = jsonObject.getString("sign");
+
+                IWXAPI iwxapi = WXAPIFactory.createWXAPI(mPlugin.cordova.getActivity(), appId);
+                iwxapi.registerApp(appId);
+
+                PayReq payRequest = new PayReq();
+                payRequest.appId = appId;
+                payRequest.partnerId = partnerId;
+                payRequest.prepayId= prepayId;
+                payRequest.packageValue = packageValue;
+                payRequest.nonceStr= nonceStr;
+                payRequest.timeStamp= timestamp;
+                payRequest.sign= sign;
+
+                iwxapi.sendReq(payRequest);
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }
