@@ -381,6 +381,7 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
                 LocationBean locationBean = new LocationBean();
                 locationBean.setCode(0);
                 locationBean.setMsg("定位成功");
+                locationBean.setLocation_name(poiInfo.name);
                 locationBean.setLocation_adress(poiInfo.address);
                 locationBean.setLocation_lat(poiInfo.location.latitude);
                 locationBean.setLocation_lng(poiInfo.location.longitude);
