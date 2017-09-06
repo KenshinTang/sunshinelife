@@ -18,8 +18,10 @@
 */
 
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 buildscript {
+    ext.kotlin_version = '1.1.4-3'
     repositories {
         mavenCentral()
         jcenter()
@@ -31,6 +33,7 @@ buildscript {
     // and https://issues.apache.org/jira/browse/CB-8143
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -256,6 +259,7 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.code.gson:gson:2.8.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 }
 
 def promptForReleaseKeyPassword() {
@@ -316,4 +320,7 @@ for (def func : cdvPluginPostBuildExtras) {
 //     ext.postBuildExtras = { ... code here ... }
 if (hasProperty('postBuildExtras')) {
     postBuildExtras()
+}
+repositories {
+    mavenCentral()
 }
