@@ -314,7 +314,7 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
                 }
                 PoiInfo poiInfo = (PoiInfo) item;
                 LocationBean locationBean = new LocationBean();
-                locationBean.setCode(0);
+                locationBean.setCode(1);
                 locationBean.setMsg("定位成功");
                 locationBean.setLocation_adress(poiInfo.address);
                 locationBean.setLocation_lat(poiInfo.location.latitude);
