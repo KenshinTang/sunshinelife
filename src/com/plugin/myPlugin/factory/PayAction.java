@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.alipay.sdk.app.PayTask;
+import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
@@ -18,15 +19,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -34,10 +32,8 @@ import okhttp3.Response;
  */
 
 public class PayAction extends IPluginAction {
-    private static final String TAG = "PayAction";
-
     public static final String ACTION_WECHAT_CALLBACK = "ACTION_WECHAT_CALLBACK";
-
+    private static final String TAG = "PayAction";
     private static final String PAY_TYPE_ALIPAY = "1";  //支付宝app
     private static final String PAY_TYPE_WECHAT = "3";  //微信app
 
@@ -177,9 +173,9 @@ public class PayAction extends IPluginAction {
             jsonObject.put("code", success ? "1" : "0");
             jsonObject.put("msg", success ? "支付成功" : "支付失败");
             if (success) {
-                mCallbackContext.success(jsonObject);
+                mCallbackContext.success(JsonWrapUtils.wrapData(jsonObject));
             } else {
-                mCallbackContext.error(jsonObject);
+                mCallbackContext.error(JsonWrapUtils.wrapData(jsonObject));
             }
         } catch (JSONException e) {
             e.printStackTrace();

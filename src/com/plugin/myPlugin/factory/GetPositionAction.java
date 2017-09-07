@@ -3,6 +3,7 @@ package com.plugin.myPlugin.factory;
 import android.content.Intent;
 import android.util.Log;
 
+import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.yunlinker.ygsh.MapLocationActivity;
 
 import org.apache.cordova.CallbackContext;
@@ -36,8 +37,7 @@ public class GetPositionAction extends IPluginAction {
                     try {
                         JSONObject jo = new JSONObject(data);
                         // 回调数据外面包一层data
-                        JSONObject result = new JSONObject();
-                        result.put("data", jo);
+                        JSONObject result = JsonWrapUtils.wrapData(jo);
                         Log.i(TAG, "get position = " + result.toString());
                         mCallbackContext.success(result);
                     } catch (JSONException e) {
@@ -46,11 +46,10 @@ public class GetPositionAction extends IPluginAction {
                 } else {
                     JSONObject jo = new JSONObject();
                     // 回调数据外面包一层data
-                    JSONObject result = new JSONObject();
                     try {
                         jo.put("code", "0");
                         jo.put("msg", "定位失败");
-                        result.put("data", jo);
+                        JSONObject result = JsonWrapUtils.wrapData(jo);
                         Log.i(TAG, "get position = " + result.toString());
                         mCallbackContext.error(result);
                     } catch (JSONException e) {

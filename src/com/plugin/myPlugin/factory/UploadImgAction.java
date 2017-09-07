@@ -31,6 +31,7 @@ import com.alibaba.sdk.android.oss.common.auth.OSSStsTokenCredentialProvider;
 import com.alibaba.sdk.android.oss.internal.OSSAsyncTask;
 import com.alibaba.sdk.android.oss.model.PutObjectRequest;
 import com.alibaba.sdk.android.oss.model.PutObjectResult;
+import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.yunlinker.ygsh.R;
 
 import org.apache.cordova.CallbackContext;
@@ -216,18 +217,17 @@ public class UploadImgAction extends IPluginAction {
                             @Override
                             public void onSuccess(PutObjectRequest request, PutObjectResult result) {
                                 Log.d("kenshin", "UploadSuccess");
-                                JSONObject dataObject = new JSONObject();
                                 JSONObject callbackJsonObject = new JSONObject();
                                 try {
-                                    dataObject.put("data", callbackJsonObject);
 //                    {code: 成功1，失败0, msg: 描述, imgUrl: [2017-03/12345.jpg,2017-03/12346.jpg]}
                                     JSONArray array = new JSONArray();
                                     array.put(imgName);
                                     callbackJsonObject.put("code", 1);
                                     callbackJsonObject.put("msg", "上传成功");
                                     callbackJsonObject.put("imgUrl", array);
-                                    mCallbackContext.success(dataObject);
-                                    Log.i("allen", "callbackMessage : " + dataObject.toString());
+                                    JSONObject data = JsonWrapUtils.wrapData(callbackJsonObject);
+                                    mCallbackContext.success(data);
+                                    Log.i("allen", "callbackMessage : " + data.toString());
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }

@@ -3,6 +3,7 @@ package com.plugin.myPlugin.factory;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.umeng.message.PushAgent;
 
 import org.apache.cordova.CallbackContext;
@@ -28,10 +29,12 @@ public class GetPushTokenAction extends IPluginAction {
             jo.put("msg", isValid ? "获取推送Token成功" : "获取推送Token失败");
             jo.put("type", "友盟");
             jo.put("token", token);
+            JSONObject result = JsonWrapUtils.wrapData(jo);
+            Log.i(TAG, "Push Token = " + result.toString());
             if (isValid) {
-                callbackContext.success(jo);
+                callbackContext.success(result);
             } else {
-                callbackContext.error(jo);
+                callbackContext.error(result);
             }
         } catch (Exception e) {
             e.printStackTrace();
