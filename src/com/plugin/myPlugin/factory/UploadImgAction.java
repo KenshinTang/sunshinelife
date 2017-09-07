@@ -2,7 +2,6 @@ package com.plugin.myPlugin.factory;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Environment;
@@ -38,7 +37,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -62,8 +60,6 @@ public class UploadImgAction extends IPluginAction {
     private static final int TAKE_TYPE = 1;
     private static final int ALBUM_TYPE = 2;
     private static final int CROP_TYPE = 3;
-    private static final int MY_PERMISSIONS_REQUEST_CAMERA_CODE = 5;
-    private static final int MY_PERMISSIONS_REQUEST_STORAGE_CODE = 6;
     private PopupWindow mPopupWindow;
     private CordovaPlugin mPlugin;
     private String mFilename = "sunshinelife.jpg";
@@ -281,16 +277,4 @@ public class UploadImgAction extends IPluginAction {
         intent.putExtra("noFaceDetection", true); // no face detection
         mPlugin.cordova.startActivityForResult(mPlugin, intent, CROP_TYPE);
     }
-
-    private Bitmap decodeUriAsBitmap(Uri uri) {
-        Bitmap bitmap = null;
-        try {
-            bitmap = BitmapFactory.decodeStream(mPlugin.cordova.getActivity().getContentResolver().openInputStream(uri));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return bitmap;
-    }
-
 }

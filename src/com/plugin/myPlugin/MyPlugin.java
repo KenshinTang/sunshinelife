@@ -26,7 +26,6 @@ import java.util.List;
 public class MyPlugin extends CordovaPlugin {
     private static final String TAG = "MyPlugin";
     private IPluginAction mPluginAction;
-    IPluginAction mPluginAction;
     private Activity mActivity;
     private JSONObject mJsonObject;
     private CallbackContext mCallbackContext;
@@ -107,9 +106,9 @@ public class MyPlugin extends CordovaPlugin {
         addPermission(permissionList, Manifest.permission.CALL_PHONE);
         addPermission(permissionList, Manifest.permission.CAMERA);
         //屏蔽掉的权限无法申请，待查看影响及原因。
-        addPermission(permissionList, Manifest.permission.READ_LOGS);
-        addPermission(permissionList, Manifest.permission.SET_DEBUG_APP);
-        addPermission(permissionList, Manifest.permission.GET_ACCOUNTS);
+//        addPermission(permissionList, Manifest.permission.READ_LOGS);
+//        addPermission(permissionList, Manifest.permission.SET_DEBUG_APP);
+//        addPermission(permissionList, Manifest.permission.GET_ACCOUNTS);
         //此2种权限比较特殊，如果要申请，需要跳到设置界面中打开。
         // Settings.ACTION_MANAGE_OVERLAY_PERMISSIO、Settings.ACTION_MANAGE_WRITE_SETTINGS
 //      addPermission(permissionList, Manifest.permission.SYSTEM_ALERT_WINDOW);
@@ -124,7 +123,7 @@ public class MyPlugin extends CordovaPlugin {
     }
 
     private void addPermission(List<String> permissionList, String permission) {
-        if (cordova.hasPermission(permission)) {
+        if (!cordova.hasPermission(permission)) {
             permissionList.add(permission);
         }
     }
