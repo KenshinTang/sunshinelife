@@ -5,6 +5,7 @@ import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.media.UMImage;
@@ -164,7 +165,7 @@ public class ShareAction extends IPluginAction {
                     JSONObject jo = new JSONObject();
                     jo.put("code", "0");
                     jo.put("msg", "分享失败");
-                    callbackContext.error(jo);
+                    callbackContext.error(JsonWrapUtils.wrapData(jo));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -177,7 +178,7 @@ public class ShareAction extends IPluginAction {
                     JSONObject jo = new JSONObject();
                     jo.put("code", "0");
                     jo.put("msg", "分享取消");
-                    callbackContext.error(jo);
+                    callbackContext.error(JsonWrapUtils.wrapData(jo));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

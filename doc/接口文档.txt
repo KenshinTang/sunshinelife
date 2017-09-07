@@ -1,94 +1,94 @@
-�ӿ��ĵ�:
+接口文档:
 http://39.108.54.14:8080/ygsh/doc.html
 
 
-ԭ������
+原生功能
 
-1.�ϴ�ͼƬ�ӿڡ��ص����ء�(ͼƬ�ϴ��������ƣ��������ϴ��õ�ͼƬ��ַ)
-	1.1�ӱ���ѡ��ͼƬ
-	1.2���������
-	1.3���ͼƬ���ȴ���800,��ȱ�ѹ����800���ϴ�
+1.上传图片接口【回调返回】(图片上传到阿里云，并返回上传好的图片地址)
+	1.1从本地选择图片
+	1.2从相机拍照
+	1.3如果图片宽度大于800,则等比压缩到800再上传
 
 
 	exec(success, error, "MyPlugin", "upImgMethod", [arg0]);
 
-	arg0 = {url:"�ϴ��ӿڡ�, count: �������ϴ�ͼƬ��������, timestamp:��ʱ�����, sign:�����ܵ��ַ�����} �����������ʽ����sign=1111&timestamp=1121212121��
+	arg0 = {url:"上传接口”, count: “允许上传图片的数量”, timestamp:”时间戳”, sign:”加密的字符串”} （比如这个格式请求：sign=1111&timestamp=1121212121）
 
-	�ص�: �����磺��{code: �ɹ�1��ʧ��0, msg: ����, imgUrl: [2017-03/12345.jpg,2017-03/12346.jpg]}
+	回调: （例如：）{data:{code: 成功1，失败0, msg: 描述, imgUrl: [2017-03/12345.jpg,2017-03/12346.jpg]}}
 
-2.��λ(Android�輯�ɵ�����,iosϵͳ�Դ�)���ص����ء�
+2.定位(Android需集成第三方,ios系统自带)【回调返回】
 	exec(success, error, "MyPlugin", "positionMethod", [arg0]);
 
 	arg0 : null
 
-	�ص�: {		code: �ɹ�1��ʧ��0,
-			msg: ����,
-			location_name:��ַ�Ϸ�������
-			location_adress:��ַ�·�������
-			location_lat: γ��
-			location_lng: ����
-			province:ʡ�������ȡ����
-			city���У������ȡ����
-			county�������أ������ȡ����
-			addr:�����ַ��������򷵻أ�û�о�Ϊ�գ�}
+	回调: {data:{	code: 成功1，失败0,
+        			msg: 描述,
+        			location_name:地址上方的名字
+        			location_adress:地址下方的名字
+        			location_lat: 纬度
+        			location_lng: 经度
+        			province:省（如果能取到）
+        			city：市（如果能取到）
+        			county：区、县（如果能取到）
+        			addr:详情地址（如果有则返回，没有就为空）}}
 
-3.�������ص����ء�
+3.分享【回调返回】
 	exec(success, error, "MyPlugin", "shareUrlMethod", [arg0]);
 
-	arg0 = {"pic":"ͼƬ��ַ����·��","title":"����","desc":"����","url":"ʵ����ת��ַ"}
+	arg0 = {"pic":"图片地址绝对路径","title":"标题","desc":"描述","url":"实际跳转地址"}
 
-	�ص� : {code: �ɹ�1��ʧ��0, msg: ����}
+	回调 : {data:{code: 成功1，失败0, msg: 描述}}
 
-4.������¼���ص����ء�
+4.三方登录【回调返回】
 	exec(success, error, "MyPlugin", "extLoginMethod", [arg0]);
 
-	arg0 = {type: ���ࣨ1΢�ţ�2QQ��}
+	arg0 = {type: 种类（1微信，2QQ）}
 
-	�ص� : {	code: �ɹ�1��ʧ��0
-		msg: ����
-		unionid:ƽ̨ID
-		face:�û�ͷ��url
-		nikename:�ǳ�
-		sex:�Ա��У�Ů��δ֪��
-		city:���У����û�о�Ϊ�գ�}
+	回调 :  {data:{code: 成功1，失败0
+         		msg: 描述
+         		unionid:平台ID
+         		face:用户头像url
+         		nikename:昵称
+         		sex:性别（男，女，未知）
+         		city:城市（如果没有就为空）}}
 
-5.֧�����ص����ء�
+5.支付【回调返回】
 	exec(success, error, "MyPlugin", "payMethod", [arg0]);
 
-	arg0 = {"type":"1,֧������2΢��","orderId":"������","}
+	arg0 = {"type":"1,支付宝，2微信","orderId":"订单号","}
 
-	�ص� : {"code":1�ɹ���0ʧ�ܣ�"msg":"����"}
+	回调 :{data:{"code":1成功，0失败，"msg":"描述”}}
 
-6.��ȡ����token���ص����ء�
+6.获取推送token【回调返回】
 	exec(success, error, "MyPlugin", "getPushTokenMethod", [arg0]);
 
 	arg0 : null
 
-	�ص� : {"code":1�ɹ�,0ʧ�ܣ�"msg":"������,��type","���ˡ����� �������֣����δ��ȡ����û�����Ͷ���Ϊ��","token":"����token"}
+	回调 :  {data:{"code":1成功,0失败，"msg":"描述”,”type","友盟、极光 推送名字，如果未获取或者没有推送端则为空","token":"设置token”}}
 
-7.��ȡ��γ�ȡ��ص����ء�
+7.获取经纬度【回调返回】
 	exec(success, error, "MyPlugin", "getLatLngMethod", [arg0]);
 
 	arg0 : null
 
-	�ص� : {"code":1�ɹ�,0ʧ�ܣ�"msg":"������,��lat��:��γ�ȡ� , ��lng��: �����ȡ�}
+	回调 :  {data:{"code":1成功,0失败，"msg":"描述”,“lat”:”纬度” , “lng”: “经度”}}
 
 
-8.�������͡��ص����ء�(�ݶ�)
+8.设置推送【回调返回】(暂定)
 	native_fns("setPush", jsonObj, t);
 	jsonObj : {act:"get,set",value:1,2}
 
 	nativeFunction.nativeCallback(d, t);
-	d : {"code":1�ɹ�,0ʧ�ܣ�"msg":"������}
+	d : {data:{"code":1成功,0失败，"msg":"描述”}}
 
-	//����˵����act=get����ȡ��ǰ�Ƽ�״̬��act=set:�����Ƽ�״̬��״ֵ̬��0Ϊ�رգ�1Ϊ��
-		�����act=get,���ص�ǰ״̬��0��1����act=set,�����Ƿ����óɹ���0��1��
-		���أ����,code
+	//参数说明：act=get，获取当前推荐状态；act=set:设置推荐状态，状态值：0为关闭，1为打开
+		结果：act=get,返回当前状态（0，1）；act=set,返回是否设置成功（0，1）
+		返回：结果,code
 
-9.����
+9.导航
 	exec(success, error, "MyPlugin", "navigationMethod", [arg0]);
 
-	arg0 : {��addr��: ��ַ����lat��:��γ�ȡ� , ��lng��: �����ȡ�}
+	arg0 : {“addr”: 地址，“lat”:”纬度” , “lng”: “经度”}
 
-	�ص� : {"code":1�ɹ�,0ʧ�ܣ�"msg":"������}
-	�������������, ����û�û�а�װ, ������ҳ����
+	回调 :{data:{"code":1成功,0失败，"msg":"描述”}}
+	进入第三方导航, 如果用户没有安装, 进入网页导航

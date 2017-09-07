@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.umeng.socialize.UMAuthListener;
 import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.bean.SHARE_MEDIA;
@@ -82,7 +83,7 @@ public class LoginAction extends IPluginAction {
                     jsonObject.put("nikename", map.get("name"));
                     jsonObject.put("sex", map.get("gender"));
                     jsonObject.put("city", map.get("city"));
-                    callbackContext.success(jsonObject);
+                    callbackContext.success(JsonWrapUtils.wrapData(jsonObject));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -95,7 +96,7 @@ public class LoginAction extends IPluginAction {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("code", 0);
                     jsonObject.put("msg", "授权失败");
-                    callbackContext.error(jsonObject);
+                    callbackContext.error(JsonWrapUtils.wrapData(jsonObject));
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -108,7 +109,7 @@ public class LoginAction extends IPluginAction {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("code", 0);
                     jsonObject.put("msg", "授权取消");
-                    callbackContext.error(jsonObject);
+                    callbackContext.error(JsonWrapUtils.wrapData(jsonObject));
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -145,7 +146,7 @@ public class LoginAction extends IPluginAction {
                     jsonObject.put("nikename", userName);
                     jsonObject.put("sex", userName);
                     jsonObject.put("city", city);
-                    callbackContext.success(jsonObject);
+                    callbackContext.success(JsonWrapUtils.wrapData(jsonObject));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -158,7 +159,7 @@ public class LoginAction extends IPluginAction {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("code", 0);
                     jsonObject.put("msg", "授权失败");
-                    callbackContext.error(jsonObject);
+                    callbackContext.error(JsonWrapUtils.wrapData(jsonObject));
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -171,7 +172,7 @@ public class LoginAction extends IPluginAction {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("code", 0);
                     jsonObject.put("msg", "授权取消");
-                    callbackContext.error(jsonObject);
+                    callbackContext.error(JsonWrapUtils.wrapData(jsonObject));
                 }catch (Exception e){
                     e.printStackTrace();
                 }

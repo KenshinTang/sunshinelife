@@ -5,11 +5,11 @@ import android.util.Log;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
+import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.plugin.myPlugin.utils.SharedPreferencesHelper;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.CordovaPreferences;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 public class GetLocationAction extends IPluginAction {
 
+    private static final String TAG = "GetLocationAction";
     private LocationClient mLocationClient;
 
     //    {"code":1成功,0失败，"msg":"描述”,“lat”:”纬度” , “lng”: “经度”}
@@ -38,7 +39,9 @@ public class GetLocationAction extends IPluginAction {
                         JSONObject object = new JSONObject();
                         object.put("code", 0);
                         object.put("msg", "定位失败");
-                        callbackContext.error(object);
+                        JSONObject result = JsonWrapUtils.wrapData(object);
+                        Log.i(TAG, "get location = " + result.toString());
+                        callbackContext.error(result);
                     } catch (JSONException e) {
                     }
                 } else {
@@ -55,6 +58,8 @@ public class GetLocationAction extends IPluginAction {
                         object.put("msg", "定位成功");
                         object.put("lat", lat);
                         object.put("lng", lng);
+                        JSONObject result = JsonWrapUtils.wrapData(object);
+                        Log.i(TAG, "get location = " + result.toString());
                         callbackContext.success(object);
                     } catch (Exception e) {
                     }

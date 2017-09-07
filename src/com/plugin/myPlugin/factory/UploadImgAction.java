@@ -31,6 +31,7 @@ import com.alibaba.sdk.android.oss.common.auth.OSSStsTokenCredentialProvider;
 import com.alibaba.sdk.android.oss.internal.OSSAsyncTask;
 import com.alibaba.sdk.android.oss.model.PutObjectRequest;
 import com.alibaba.sdk.android.oss.model.PutObjectResult;
+import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.yunlinker.ygsh.R;
 
 import org.apache.cordova.CallbackContext;
@@ -128,6 +129,11 @@ public class UploadImgAction extends IPluginAction {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        Log.d("allen", "onActivityResult: " + requestCode + " resultCode" + resultCode);
+        if (resultCode == 0) {//返回
+            Log.d("allen", "返回");
+            return;
+        }
         switch (requestCode) {
             case TAKE_TYPE:
                 cropPhoto(imageUri);//裁剪图片
@@ -136,17 +142,12 @@ public class UploadImgAction extends IPluginAction {
                 cropPhoto(intent.getData());
                 break;
             case CROP_TYPE:
-                if (imageUri != null) {
-                    Bitmap bitmap = decodeUriAsBitmap(imageUri);
-                    if (bitmap != null) {
-                        //Android 6.0 需要检查权限 ，对于没有权限的需要先申请权限
-                        if (ContextCompat.checkSelfPermission(mPlugin.cordova.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                            //申请拍照权限
-                            ActivityCompat.requestPermissions(mPlugin.cordova.getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_STORAGE_CODE);
-                        }
-                        uploadPic();
-                    }
+                if (ContextCompat.checkSelfPermission(mPlugin.cordova.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    //申请拍照权限
+                    ActivityCompat.requestPermissions(mPlugin.cordova.getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_STORAGE_CODE);
+                    return;
                 }
+                uploadPic();
                 break;
         }
     }
@@ -216,18 +217,17 @@ public class UploadImgAction extends IPluginAction {
                             @Override
                             public void onSuccess(PutObjectRequest request, PutObjectResult result) {
                                 Log.d("kenshin", "UploadSuccess");
-                                JSONObject dataObject = new JSONObject();
                                 JSONObject callbackJsonObject = new JSONObject();
                                 try {
-                                    dataObject.put("data", callbackJsonObject);
 //                    {code: 成功1，失败0, msg: 描述, imgUrl: [2017-03/12345.jpg,2017-03/12346.jpg]}
                                     JSONArray array = new JSONArray();
                                     array.put(imgName);
                                     callbackJsonObject.put("code", 1);
                                     callbackJsonObject.put("msg", "上传成功");
                                     callbackJsonObject.put("imgUrl", array);
-                                    mCallbackContext.success(dataObject);
-                                    Log.i("allen", "callbackMessage : " + dataObject.toString());
+                                    JSONObject data = JsonWrapUtils.wrapData(callbackJsonObject);
+                                    mCallbackContext.success(data);
+                                    Log.i("allen", "callbackMessage : " + data.toString());
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
