@@ -1,6 +1,7 @@
 package com.plugin.myPlugin.factory;
 
 import android.content.Intent;
+import android.util.Log;
 
 import com.yunlinker.ygsh.MapLocationActivity;
 
@@ -14,7 +15,9 @@ import org.json.JSONObject;
  */
 
 public class GetPositionAction extends IPluginAction {
-    public static final int GET_LOCATION = 4;
+    private static final String TAG = "GetPositionAction";
+
+    private static final int GET_LOCATION = 4;
     private CallbackContext mCallbackContext;
 
     @Override
@@ -32,18 +35,27 @@ public class GetPositionAction extends IPluginAction {
                     String data = intent.getStringExtra("data");
                     try {
                         JSONObject jo = new JSONObject(data);
-                        mCallbackContext.success(jo);
-                    } catch (JSONException e) {
-                    }
-                } else {
-                    JSONObject jo = new JSONObject();
-                    try {
-                        jo.put("code", "0");
-                        jo.put("msg", "定位失败");
+                        // 回调数据外面包一层data
+                        JSONObject result = new JSONObject();
+                        result.put("data", jo);
+                        Log.i(TAG, "get position = " + result.toString());
+                        mCallbackContext.success(result);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    mCallbackContext.error(jo);
+                } else {
+                    JSONObject jo = new JSONObject();
+                    // 回调数据外面包一层data
+                    JSONObject result = new JSONObject();
+                    try {
+                        jo.put("code", "0");
+                        jo.put("msg", "定位失败");
+                        result.put("data", jo);
+                        Log.i(TAG, "get position = " + result.toString());
+                        mCallbackContext.error(result);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
         }
