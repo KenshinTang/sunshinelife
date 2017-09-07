@@ -42,7 +42,7 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
 
     @Override
     public void onResp(BaseResp resp) {
-        Log.d(TAG, "onPayFinish, errCode = " + resp.errCode);
+        Log.d(TAG, "onPayFinish, errCode = " + resp.errCode + ", errStr = " + resp.errStr + resp);
 
         if (resp.getType() == ConstantsAPI.COMMAND_PAY_BY_WX) {
             Intent intent = new Intent(PayAction.ACTION_WECHAT_CALLBACK);

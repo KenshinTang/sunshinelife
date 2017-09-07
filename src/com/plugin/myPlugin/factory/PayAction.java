@@ -44,6 +44,7 @@ public class PayAction extends IPluginAction {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (ACTION_WECHAT_CALLBACK.equals(intent.getAction())) {
+                Log.i(TAG, ACTION_WECHAT_CALLBACK + " " + intent.toString());
                 payCallback(0 == intent.getIntExtra("pay_result", -1));
             }
         }
@@ -62,6 +63,8 @@ public class PayAction extends IPluginAction {
 
         // 通过订单号跑订单接口信息接口获取订单信息, 然后再根据订单信息下单支付.
         getOrderInfo(type, orderId);
+//        getOrderInfo(PAY_TYPE_ALIPAY, orderId);
+//        getOrderInfo(PAY_TYPE_WECHAT, orderId);
     }
 
     private void getOrderInfo(final String type, String orderId) {
@@ -151,15 +154,13 @@ public class PayAction extends IPluginAction {
                 PayReq payRequest = new PayReq();
                 payRequest.appId = appId;
                 payRequest.partnerId = partnerId;
-                payRequest.prepayId= prepayId;
+                payRequest.prepayId = prepayId;
                 payRequest.packageValue = packageValue;
-                payRequest.nonceStr= nonceStr;
-                payRequest.timeStamp= timestamp;
-                payRequest.sign= sign;
+                payRequest.nonceStr = nonceStr;
+                payRequest.timeStamp = timestamp;
+                payRequest.sign = sign;
 
                 iwxapi.sendReq(payRequest);
-
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
