@@ -129,6 +129,11 @@ public class UploadImgAction extends IPluginAction {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        Log.d("allen", "onActivityResult: " + requestCode + " resultCode" + resultCode);
+        if (resultCode == 0) {//返回
+            Log.d("allen", "返回");
+            return;
+        }
         switch (requestCode) {
             case TAKE_TYPE:
                 cropPhoto(imageUri);//裁剪图片
@@ -137,17 +142,12 @@ public class UploadImgAction extends IPluginAction {
                 cropPhoto(intent.getData());
                 break;
             case CROP_TYPE:
-                if (imageUri != null) {
-                    Bitmap bitmap = decodeUriAsBitmap(imageUri);
-                    if (bitmap != null) {
-                        //Android 6.0 需要检查权限 ，对于没有权限的需要先申请权限
-                        if (ContextCompat.checkSelfPermission(mPlugin.cordova.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                            //申请拍照权限
-                            ActivityCompat.requestPermissions(mPlugin.cordova.getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_STORAGE_CODE);
-                        }
-                        uploadPic();
-                    }
+                if (ContextCompat.checkSelfPermission(mPlugin.cordova.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    //申请拍照权限
+                    ActivityCompat.requestPermissions(mPlugin.cordova.getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_STORAGE_CODE);
+                    return;
                 }
+                uploadPic();
                 break;
         }
     }
