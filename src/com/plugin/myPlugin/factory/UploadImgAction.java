@@ -63,10 +63,11 @@ public class UploadImgAction extends IPluginAction {
     private PopupWindow mPopupWindow;
     private CordovaPlugin mPlugin;
     private String mFilename = "sunshinelife.jpg";
-    private Uri imageUri = Uri.parse("file:///"+Environment.getExternalStorageDirectory().getPath()+"/"+mFilename);
+    private Uri imageUri = Uri.parse("file:///" + Environment.getExternalStorageDirectory().getPath() + "/" + mFilename);
     private JSONObject mJSONObject;
     private CallbackContext mCallbackContext;
     private OSS oss;
+
     @Override
     public void doAction(final CordovaPlugin plugin, JSONObject jsonObject, CallbackContext callbackContext) {
         LayoutInflater inflater = LayoutInflater.from(plugin.cordova.getActivity());
@@ -131,6 +132,7 @@ public class UploadImgAction extends IPluginAction {
                 break;
         }
     }
+
     /**
      * 上传头像
      */
@@ -211,6 +213,7 @@ public class UploadImgAction extends IPluginAction {
                                     e.printStackTrace();
                                 }
                             }
+
                             @Override
                             public void onFailure(PutObjectRequest request, ClientException clientExcepion, ServiceException serviceException) {
                                 // 请求异常
