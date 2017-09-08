@@ -1,6 +1,9 @@
 package com.plugin.myPlugin.factory;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -64,6 +67,7 @@ public class UploadImgAction extends IPluginAction {
     private JSONObject mJSONObject;
     private CallbackContext mCallbackContext;
     private OSS oss;
+    private int mCount;
 
     @Override
     public void doAction(final CordovaPlugin plugin, JSONObject jsonObject, CallbackContext callbackContext) {
@@ -71,6 +75,11 @@ public class UploadImgAction extends IPluginAction {
         View view = inflater.inflate(R.layout.popup_take_photo_layout, null);
         this.mPlugin = plugin;
         this.mJSONObject = jsonObject;
+        try {
+            this.mCount = jsonObject.getInt("count");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         this.mCallbackContext = callbackContext;
         mPopupWindow = new PopupWindow(view,
                 WindowManager.LayoutParams.MATCH_PARENT,
@@ -118,15 +127,55 @@ public class UploadImgAction extends IPluginAction {
         }
         switch (requestCode) {
             case TAKE_TYPE:
-                cropPhoto(imageUri);//裁剪图片
+                // count为1的时候目前是上传头像的场景.
+                // count大于1的时候是评论的场景. 不需要裁剪.
+                // TODO: 需要重构, 暂时先这么判断
+                if (mCount == 1) {
+                    cropPhoto(imageUri);//裁剪图片
+                } else {
+                    uploadPic();
+                }
                 break;
             case ALBUM_TYPE:
-                cropPhoto(intent.getData());
+                // count为1的时候目前是上传头像的场景.
+                // count大于1的时候是评论的场景. 不需要裁剪.
+                // TODO: 需要重构, 暂时先这么判断
+                // content://media/external/images/media/92317
+                if (mCount == 1) {
+                    cropPhoto(intent.getData());
+                } else {
+                    imageUri = intent.getData();
+                    uploadPic();
+                }
                 break;
             case CROP_TYPE:
                 uploadPic();
                 break;
         }
+    }
+
+    // 通过Uri拿绝对路径
+    private static String getRealFilePath(final Context context, final Uri uri) {
+        if (null == uri) return null;
+        final String scheme = uri.getScheme();
+        String data = null;
+        if (scheme == null)
+            data = uri.getPath();
+        else if (ContentResolver.SCHEME_FILE.equals(scheme)) {
+            data = uri.getPath();
+        } else if (ContentResolver.SCHEME_CONTENT.equals(scheme)) {
+            Cursor cursor = context.getContentResolver().query(uri, new String[]{MediaStore.Images.ImageColumns.DATA}, null, null, null);
+            if (null != cursor) {
+                if (cursor.moveToFirst()) {
+                    int index = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                    if (index > -1) {
+                        data = cursor.getString(index);
+                    }
+                }
+                cursor.close();
+            }
+        }
+        return data;
     }
 
     /**
@@ -180,7 +229,14 @@ public class UploadImgAction extends IPluginAction {
                         conf.setMaxErrorRetry(2); // 失败后最大重试次数，默认2次
                         OSSLog.enableLog();
                         oss = new OSSClient(mPlugin.cordova.getActivity().getApplicationContext(), "http://oss-cn-shenzhen.aliyuncs.com", credentialProvider, conf);
-                        PutObjectRequest put = new PutObjectRequest("ygsh", imgName, imageUri.getPath());
+
+                        String path;
+                        if (imageUri.getScheme().equals("content")) {
+                            path = getRealFilePath(mPlugin.cordova.getActivity(), imageUri);
+                        } else {
+                            path = imageUri.getPath();
+                        }
+                        PutObjectRequest put = new PutObjectRequest("ygsh", imgName, path);
                         OSSAsyncTask task = oss.asyncPutObject(put, new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
                             @Override
                             public void onSuccess(PutObjectRequest request, PutObjectResult result) {
