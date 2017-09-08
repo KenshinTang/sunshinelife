@@ -61,13 +61,13 @@ public class PayAction extends IPluginAction {
         mPlugin.cordova.getActivity().registerReceiver(mWechatPayCallbackReceiver, new IntentFilter(ACTION_WECHAT_CALLBACK));
 
         // 通过订单号跑订单接口信息接口获取订单信息, 然后再根据订单信息下单支付.
-        getOrderInfo(type, orderId);
+//        getOrderInfo(type, orderId);
 //        getOrderInfo(PAY_TYPE_ALIPAY, orderId);
-//        getOrderInfo(PAY_TYPE_WECHAT, orderId);
+        getOrderInfo(PAY_TYPE_WECHAT, orderId);
     }
 
     private void getOrderInfo(final String type, String orderId) {
-        String url = "http://39.108.54.14:8080/ygsh/api/pay/getPayInfo?type=" + type + "&ordersid=" + orderId;
+        final String url = "http://39.108.54.14:8080/ygsh/api/pay/getPayInfo?type=" + type + "&ordersid=" + orderId;
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(url).get().build();
 
@@ -80,7 +80,8 @@ public class PayAction extends IPluginAction {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String result = response.body().string();
-                Logger.i("get payInfo : " + result);
+                Logger.i("get payInfo from " + url);
+                Logger.json(result);
                 // {"code":1,"msg":"",
                 // "data":"alipay_sdk=alipay-sdk-java-dynamicVersionNo&
                 // app_id=2017082308344253&
@@ -135,7 +136,8 @@ public class PayAction extends IPluginAction {
             //        pageSize: 0,
             //        success: true
             //}
-            Logger.i("get payResult" + orderInfo);
+            Logger.i("get payResult");
+            Logger.json(orderInfo);
             try {
                 JSONObject jsonObject = new JSONObject(orderInfo);
 

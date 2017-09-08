@@ -17,9 +17,9 @@ public class JsonWrapUtils {
         try {
             result.put("data", jsonObject);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Logger.e(e, "", "");
         }
-        Logger.d("result callback" + jsonObject);
+        Logger.json(result.toString());
         return result;
     }
 }

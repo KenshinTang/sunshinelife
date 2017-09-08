@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.orhanobut.logger.Logger;
 import com.plugin.myPlugin.factory.PayAction;
 import com.tencent.mm.opensdk.constants.ConstantsAPI;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
@@ -42,7 +43,7 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
 
     @Override
     public void onResp(BaseResp resp) {
-        Log.d(TAG, "onPayFinish, errCode = " + resp.errCode + ", errStr = " + resp.errStr + resp);
+        Logger.d("onPayFinish, errCode = " + resp.errCode + ", errStr = " + resp.errStr + ", " + resp);
 
         if (resp.getType() == ConstantsAPI.COMMAND_PAY_BY_WX) {
             Intent intent = new Intent(PayAction.ACTION_WECHAT_CALLBACK);
