@@ -5,9 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.alipay.sdk.app.PayTask;
+import com.orhanobut.logger.Logger;
 import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
@@ -33,7 +33,6 @@ import okhttp3.Response;
 
 public class PayAction extends IPluginAction {
     public static final String ACTION_WECHAT_CALLBACK = "ACTION_WECHAT_CALLBACK";
-    private static final String TAG = "PayAction";
     private static final String PAY_TYPE_ALIPAY = "1";  //支付宝app
     private static final String PAY_TYPE_WECHAT = "3";  //微信app
 
@@ -44,7 +43,7 @@ public class PayAction extends IPluginAction {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (ACTION_WECHAT_CALLBACK.equals(intent.getAction())) {
-                Log.i(TAG, ACTION_WECHAT_CALLBACK + " " + intent.toString());
+                Logger.i(ACTION_WECHAT_CALLBACK + " " + intent.toString());
                 payCallback(0 == intent.getIntExtra("pay_result", -1));
             }
         }
@@ -57,7 +56,7 @@ public class PayAction extends IPluginAction {
 
         String type = jsonObject.optString("type");
         String orderId = jsonObject.optString("orderId");
-        Log.i(TAG, "type[1、支付宝app ;2、支付宝即时到账；3、微信app;4、微信公众号;5、微信扫码]:" + type + ", orderId:" + orderId);
+        Logger.i("type[1、支付宝app ;2、支付宝即时到账；3、微信app;4、微信公众号;5、微信扫码]:" + type + ", orderId:" + orderId);
 
         mPlugin.cordova.getActivity().registerReceiver(mWechatPayCallbackReceiver, new IntentFilter(ACTION_WECHAT_CALLBACK));
 
@@ -81,7 +80,7 @@ public class PayAction extends IPluginAction {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String result = response.body().string();
-                Log.i(TAG, "get payInfo : " + result);
+                Logger.i("get payInfo : " + result);
                 // {"code":1,"msg":"",
                 // "data":"alipay_sdk=alipay-sdk-java-dynamicVersionNo&
                 // app_id=2017082308344253&
@@ -105,7 +104,7 @@ public class PayAction extends IPluginAction {
                 public void run() {
                     PayTask alipay = new PayTask(mPlugin.cordova.getActivity());
                     Map<String, String> result = alipay.payV2(orderInfo, true);
-                    Log.i(TAG, "get payResult" + result.toString());
+                    Logger.i("get payResult" + result.toString());
 
                     PayResult payResult = new PayResult(result);
                     String resultStatus = payResult.getResultStatus();
@@ -136,7 +135,7 @@ public class PayAction extends IPluginAction {
             //        pageSize: 0,
             //        success: true
             //}
-            Log.i(TAG, "get payResult" + orderInfo);
+            Logger.i("get payResult" + orderInfo);
             try {
                 JSONObject jsonObject = new JSONObject(orderInfo);
 

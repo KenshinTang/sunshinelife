@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.orhanobut.logger.Logger;
 import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.umeng.socialize.UMAuthListener;
 import com.umeng.socialize.UMShareAPI;
@@ -40,7 +41,7 @@ public class LoginAction extends IPluginAction {
     @Override
     public void doAction(CordovaPlugin plugin, JSONObject jsonObject, CallbackContext callbackContext) {
         int loginType = jsonObject.optInt("type");
-        Log.i(TAG, "login type[1:wechat, 2:QQ] = " + loginType);
+        Logger.i("login type[1:wechat, 2:QQ] = " + loginType);
 
         switch (loginType) {
             case LOGINTYPE_WECHAT:
@@ -74,7 +75,7 @@ public class LoginAction extends IPluginAction {
                 // iconurl=http://q.qlogo.cn/qqapp/1105543710/C9A1CC7DD7352E545EE9BF79A6B549E0/100,
                 // name=剑心, uid=C9A1CC7DD7352E545EE9BF79A6B549E0,
                 // expiration=1511362939428, expires_in=1511362939428, level=0, ret=0}
-                Log.i(TAG, share_media + "授权成功:" + map);
+                Logger.i(share_media + "授权成功:" + map);
                 try {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("code", 1);
@@ -92,7 +93,7 @@ public class LoginAction extends IPluginAction {
             @Override
             public void onError(SHARE_MEDIA share_media, int i, Throwable throwable) {
                 try{
-                    Log.w(TAG, share_media + "授权失败", throwable);
+                    Logger.w(share_media + "授权失败", throwable);
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("code", 0);
                     jsonObject.put("msg", "授权失败");
@@ -105,7 +106,7 @@ public class LoginAction extends IPluginAction {
             @Override
             public void onCancel(SHARE_MEDIA share_media, int i) {
                 try{
-                    Log.w(TAG, share_media + "授权取消");
+                    Logger.w(share_media + "授权取消");
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("code", 0);
                     jsonObject.put("msg", "授权取消");
@@ -168,7 +169,7 @@ public class LoginAction extends IPluginAction {
             @Override
             public void onCancel(Platform platform, int i) {
                 try{
-                    Log.w(TAG, platform.getName() + "授权取消");
+                    Logger.w(platform.getName() + "授权取消");
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("code", 0);
                     jsonObject.put("msg", "授权取消");

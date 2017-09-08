@@ -1,10 +1,9 @@
 package com.plugin.myPlugin.factory;
 
-import android.util.Log;
-
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
+import com.orhanobut.logger.Logger;
 import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.plugin.myPlugin.utils.SharedPreferencesHelper;
 
@@ -18,8 +17,6 @@ import org.json.JSONObject;
  */
 
 public class GetLocationAction extends IPluginAction {
-
-    private static final String TAG = "GetLocationAction";
     private LocationClient mLocationClient;
 
     //    {"code":1成功,0失败，"msg":"描述”,“lat”:”纬度” , “lng”: “经度”}
@@ -39,14 +36,12 @@ public class GetLocationAction extends IPluginAction {
                         JSONObject object = new JSONObject();
                         object.put("code", 0);
                         object.put("msg", "定位失败");
-                        JSONObject result = JsonWrapUtils.wrapData(object);
-                        Log.i(TAG, "get location = " + result.toString());
-                        callbackContext.error(result);
+                        callbackContext.error(JsonWrapUtils.wrapData(object));
                     } catch (JSONException e) {
                     }
                 } else {
                     //定位成功
-                    Log.d("allen", "onReceiveLocation: " + "经度：" + lat + "纬度：" + lng);
+                    Logger.d("onReceiveLocation: " + "经度：" + lat + "纬度：" + lng);
                     try {
                         SharedPreferencesHelper helper = new SharedPreferencesHelper(plugin.cordova.getActivity());
                         helper.save("lat", lat);
@@ -58,9 +53,7 @@ public class GetLocationAction extends IPluginAction {
                         object.put("msg", "定位成功");
                         object.put("lat", lat);
                         object.put("lng", lng);
-                        JSONObject result = JsonWrapUtils.wrapData(object);
-                        Log.i(TAG, "get location = " + result.toString());
-                        callbackContext.success(object);
+                        callbackContext.success(JsonWrapUtils.wrapData(object));
                     } catch (Exception e) {
                     }
                 }

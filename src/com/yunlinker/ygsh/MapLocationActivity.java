@@ -10,7 +10,6 @@ import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -53,6 +52,7 @@ import com.baidu.mapapi.search.poi.PoiIndoorResult;
 import com.baidu.mapapi.search.poi.PoiResult;
 import com.baidu.mapapi.search.poi.PoiSearch;
 import com.google.gson.Gson;
+import com.orhanobut.logger.Logger;
 import com.plugin.myPlugin.bean.LocationBean;
 import com.yunlinker.ygsh.view.SearchEditView;
 
@@ -66,8 +66,6 @@ import java.util.List;
  * description:
  */
 public class MapLocationActivity extends Activity implements OnGetPoiSearchResultListener, BaiduMap.OnMapStatusChangeListener {
-
-    public static final String TAG = "allen";
     /**
      * 定位SDK的核心类
      */
@@ -96,18 +94,18 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
 
     @Override
     public void onMapStatusChangeStart(MapStatus mapStatus) {
-        Log.d("allen", "onMapStatusChangeStart");
+        Logger.d("onMapStatusChangeStart");
     }
 
     @Override
     public void onMapStatusChange(MapStatus mapStatus) {
-        Log.d("allen", "onMapStatusChange");
+        Logger.d("onMapStatusChange");
     }
 
     //移动地图对附近做搜索
     @Override
     public void onMapStatusChangeFinish(MapStatus mapStatus) {
-        Log.d("allen", "onMapStatusChangeFinish");
+        Logger.d("onMapStatusChangeFinish");
         searchMoveFinish(mapStatus.target);
     }
 
@@ -160,7 +158,7 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
                 MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(item.location);
                 mBaiduMap.setMapStatus(u);
                 searchMoveFinish(item.location);
-                Log.d(TAG, "onItemClick: poiInfo" + item.name + " " + item.address + " " + item.location.toString());
+                Logger.d("onItemClick: poiInfo" + item.name + " " + item.address + " " + item.location.toString());
             }
         });
         mListAdapter = new ListAdapter(0);
@@ -172,7 +170,7 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
             public void finishComposing() {
                 showMapView();
                 mSearchEditView.clearFocus();
-                Log.d(TAG, "finishComposing: ");
+                Logger.d("finishComposing: ");
             }
         });
         mSearchEditView.addTextChangedListener(new TextWatcher() {
@@ -210,7 +208,7 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
                                 return;
                             }
                             List<PoiInfo> poiInfos = poiResult.getAllPoi();
-                            Log.d(TAG, "onGetPoiResult");
+                            Logger.d("onGetPoiResult");
                             PoiSearchAdapter poiSearchAdapter = new PoiSearchAdapter(mContext, poiInfos);
                             mSearchPoisList.setVisibility(View.VISIBLE);
                             mSearchPoisList.setAdapter(poiSearchAdapter);
@@ -220,12 +218,12 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
                         //poi 详情查询结果回调
                         @Override
                         public void onGetPoiDetailResult(PoiDetailResult poiDetailResult) {
-                            Log.d(TAG, "onGetPoiResult");
+                            Logger.d("onGetPoiResult");
                         }
 
                         @Override
                         public void onGetPoiIndoorResult(PoiIndoorResult poiIndoorResult) {
-                            Log.d(TAG, "onGetPoiResult");
+                            Logger.d("onGetPoiResult");
                         }
                     });
                     poiSearch.searchInCity(poiCitySearchOption);
@@ -363,7 +361,7 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
         GeoCoder geoCoder = GeoCoder.newInstance();
         ReverseGeoCodeOption reverseCoder = new ReverseGeoCodeOption();
         reverseCoder.location(target);
-        Log.d(TAG, "searchMoveFinish: ");
+        Logger.d("searchMoveFinish: ");
         geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
             @Override
             public void onGetReverseGeoCodeResult(ReverseGeoCodeResult arg0) {
@@ -440,13 +438,13 @@ public class MapLocationActivity extends Activity implements OnGetPoiSearchResul
         public void onReceive(Context context, Intent intent) {
             String s = intent.getAction();
             if (s.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR)) {
-                Log.d(TAG, "key 验证出错! 错误码 :" + intent.getIntExtra
+                Logger.d("key 验证出错! 错误码 :" + intent.getIntExtra
                         (SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_CODE, 0)
                         + " ; 请在 AndroidManifest.xml 文件中检查 key 设置");
             } else if (s.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK)) {
-                Log.d(TAG, "key 验证成功! 功能可以正常使用");
+                Logger.d("key 验证成功! 功能可以正常使用");
             } else if (s.equals(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR)) {
-                Log.d(TAG, "网络出错");
+                Logger.d("网络出错");
             }
         }
     }

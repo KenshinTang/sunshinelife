@@ -1,8 +1,8 @@
 package com.plugin.myPlugin.factory;
 
 import android.text.TextUtils;
-import android.util.Log;
 
+import com.orhanobut.logger.Logger;
 import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.umeng.message.PushAgent;
 
@@ -15,13 +15,11 @@ import org.json.JSONObject;
  */
 
 public class GetPushTokenAction extends IPluginAction {
-    private static final String TAG = "GetPushTokenAction";
-
     //{"code":1成功,0失败，"msg":"描述”,”type","友盟、极光 推送名字，如果未获取或者没有推送端则为空","token":"设置token"}
     @Override
     public void doAction(CordovaPlugin plugin, JSONObject jsonObject, CallbackContext callbackContext) {
         String token = PushAgent.getInstance(plugin.cordova.getActivity()).getRegistrationId();
-        Log.i(TAG, "UMeng Push Token :" + token);
+        Logger.i("UMeng Push Token :" + token);
         boolean isValid = checkToken(token);
         try {
             JSONObject jo = new JSONObject();
@@ -30,7 +28,6 @@ public class GetPushTokenAction extends IPluginAction {
             jo.put("type", "友盟");
             jo.put("token", token);
             JSONObject result = JsonWrapUtils.wrapData(jo);
-            Log.i(TAG, "Push Token = " + result.toString());
             if (isValid) {
                 callbackContext.success(result);
             } else {

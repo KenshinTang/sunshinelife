@@ -1,7 +1,6 @@
 package com.plugin.myPlugin.factory;
 
 import android.content.Intent;
-import android.util.Log;
 
 import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.yunlinker.ygsh.MapLocationActivity;
@@ -16,7 +15,6 @@ import org.json.JSONObject;
  */
 
 public class GetPositionAction extends IPluginAction {
-    private static final String TAG = "GetPositionAction";
 
     private static final int GET_LOCATION = 4;
     private CallbackContext mCallbackContext;
@@ -38,7 +36,6 @@ public class GetPositionAction extends IPluginAction {
                         JSONObject jo = new JSONObject(data);
                         // 回调数据外面包一层data
                         JSONObject result = JsonWrapUtils.wrapData(jo);
-                        Log.i(TAG, "get position = " + result.toString());
                         mCallbackContext.success(result);
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -50,7 +47,6 @@ public class GetPositionAction extends IPluginAction {
                         jo.put("code", "0");
                         jo.put("msg", "定位失败");
                         JSONObject result = JsonWrapUtils.wrapData(jo);
-                        Log.i(TAG, "get position = " + result.toString());
                         mCallbackContext.error(result);
                     } catch (JSONException e) {
                         e.printStackTrace();

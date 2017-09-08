@@ -2,7 +2,6 @@ package com.yunlinker.ygsh;
 
 import android.app.Application;
 import android.os.StrictMode;
-import android.util.Log;
 
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
@@ -64,12 +63,12 @@ public class YunApplication extends Application {
         PushAgent.getInstance(this).register(new IUmengRegisterCallback() {
             @Override
             public void onSuccess(String s) {
-                Log.i(TAG, "UMeng push register success, device token = " + s);
+                Logger.i("UMeng push register success, device token = " + s);
             }
 
             @Override
             public void onFailure(String s, String s1) {
-                Log.w(TAG, "UMeng push register failed, " + s + ", " + s1);
+                Logger.w("UMeng push register failed, " + s + ", " + s1);
             }
         });
     }

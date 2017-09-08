@@ -6,11 +6,12 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
+
+import com.orhanobut.logger.Logger;
 
 /**
  * author:  Allen <br>
@@ -18,11 +19,12 @@ import android.view.inputmethod.InputConnectionWrapper;
  * description:
  */
 public class SearchEditView extends AppCompatEditText implements View.OnFocusChangeListener{
-    private static final String TAG = "allen";
     /**
      * 是否是默认图标再左边的样式
      */
     private boolean isLeft = false;
+    private OnFinishComposingListener mFinishComposingListener;
+
     public SearchEditView(Context context) {
         this(context, null);
         init();
@@ -64,13 +66,11 @@ public class SearchEditView extends AppCompatEditText implements View.OnFocusCha
 
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-        Log.d(TAG, "onFocusChange execute"+hasFocus);
+        Logger.d("onFocusChange execute" + hasFocus);
         if (TextUtils.isEmpty(getText().toString())) {
             isLeft = hasFocus;
         }
     }
-
-    private OnFinishComposingListener mFinishComposingListener;
 
     public void setOnFinishComposingListener(OnFinishComposingListener listener) {
         this.mFinishComposingListener = listener;
@@ -79,6 +79,10 @@ public class SearchEditView extends AppCompatEditText implements View.OnFocusCha
     @Override
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
         return new MyInputConnection(super.onCreateInputConnection(outAttrs), false);
+    }
+
+    public interface OnFinishComposingListener {
+        public void finishComposing();
     }
 
     public class MyInputConnection extends InputConnectionWrapper {
@@ -94,9 +98,5 @@ public class SearchEditView extends AppCompatEditText implements View.OnFocusCha
             }
             return finishComposing;
         }
-    }
-
-    public interface OnFinishComposingListener {
-        public void finishComposing();
     }
 }

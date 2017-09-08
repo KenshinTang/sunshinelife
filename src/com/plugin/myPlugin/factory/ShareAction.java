@@ -1,7 +1,6 @@
 package com.plugin.myPlugin.factory;
 
-import android.util.Log;
-
+import com.orhanobut.logger.Logger;
 import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
@@ -24,7 +23,6 @@ import cn.sharesdk.onekeyshare.OnekeyShare;
  */
 
 public class ShareAction extends IPluginAction {
-    private static final String TAG = "ShareAction";
 
     // [{"pic":"https:\/\/m.baidu.com\/static\/index\/plus\/plus_logo.png",
     // "title":"ceshititle",
@@ -36,7 +34,7 @@ public class ShareAction extends IPluginAction {
         String imagePath = jsonObject.optString("pic");
         String desc = jsonObject.optString("desc");
         String url = jsonObject.optString("url");
-        Log.i(TAG, "show Share [title:" + title + ", imagePath:" + imagePath + ", desc:" + desc + ", url:" + url + "]");
+        Logger.d("show Share [title:" + title + ", imagePath:" + imagePath + ", desc:" + desc + ", url:" + url + "]");
         //友盟分享
         showUmengShare(plugin.cordova, title, url, desc, imagePath, callbackContext);
         //Mob分享
@@ -60,11 +58,11 @@ public class ShareAction extends IPluginAction {
                     @Override
                     public void onResult(SHARE_MEDIA share_media) {
                         try {
-                            Log.i(TAG, "分享成功 onResult SHARE_MEDIA = " + share_media);
+                            Logger.i("分享成功 onResult SHARE_MEDIA = " + share_media);
                             JSONObject jo = new JSONObject();
                             jo.put("code", "1");
                             jo.put("msg", "分享成功");
-                            callbackContext.success(jo);
+                            callbackContext.success(JsonWrapUtils.wrapData(jo));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -73,11 +71,11 @@ public class ShareAction extends IPluginAction {
                     @Override
                     public void onError(SHARE_MEDIA share_media, Throwable throwable) {
                         try {
-                            Log.w(TAG, "分享失败 onError SHARE_MEDIA = " + share_media, throwable);
+                            Logger.i("分享失败 onError SHARE_MEDIA = " + share_media + throwable);
                             JSONObject jo = new JSONObject();
                             jo.put("code", "0");
                             jo.put("msg", "分享失败");
-                            callbackContext.error(jo);
+                            callbackContext.error(JsonWrapUtils.wrapData(jo));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -86,11 +84,11 @@ public class ShareAction extends IPluginAction {
                     @Override
                     public void onCancel(SHARE_MEDIA share_media) {
                         try {
-                            Log.w(TAG, "分享取消 onCancel SHARE_MEDIA = " + share_media);
+                            Logger.i("分享取消 onCancel SHARE_MEDIA = " + share_media);
                             JSONObject jo = new JSONObject();
                             jo.put("code", "0");
                             jo.put("msg", "分享取消");
-                            callbackContext.error(jo);
+                            callbackContext.error(JsonWrapUtils.wrapData(jo));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -123,11 +121,11 @@ public class ShareAction extends IPluginAction {
             @Override
             public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
                 try {
-                    Log.i(TAG, "platform = " + platform + ", i = " + i + "hashmap = " + hashMap);
+                    Logger.i("platform = " + platform + ", i = " + i + "hashmap = " + hashMap);
                     JSONObject jo = new JSONObject();
                     jo.put("code", "1");
                     jo.put("msg", "分享成功");
-                    callbackContext.success(jo);
+                    callbackContext.success(JsonWrapUtils.wrapData(jo));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -136,7 +134,7 @@ public class ShareAction extends IPluginAction {
             @Override
             public void onError(Platform platform, int i, Throwable throwable) {
                 try {
-                    Log.w(TAG, "platform = " + platform + ", i = " + i, throwable);
+                    Logger.d("platform = " + platform + ", i = " + i, throwable);
                     JSONObject jo = new JSONObject();
                     jo.put("code", "0");
                     jo.put("msg", "分享失败");
@@ -149,7 +147,7 @@ public class ShareAction extends IPluginAction {
             @Override
             public void onCancel(Platform platform, int i) {
                 try {
-                    Log.w(TAG, "platform = " + platform + ", i = " + i);
+                    Logger.d("platform = " + platform + ", i = " + i);
                     JSONObject jo = new JSONObject();
                     jo.put("code", "0");
                     jo.put("msg", "分享取消");

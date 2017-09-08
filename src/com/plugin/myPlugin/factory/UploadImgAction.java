@@ -6,7 +6,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +25,7 @@ import com.alibaba.sdk.android.oss.common.auth.OSSStsTokenCredentialProvider;
 import com.alibaba.sdk.android.oss.internal.OSSAsyncTask;
 import com.alibaba.sdk.android.oss.model.PutObjectRequest;
 import com.alibaba.sdk.android.oss.model.PutObjectResult;
+import com.orhanobut.logger.Logger;
 import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.yunlinker.ygsh.R;
 
@@ -35,10 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -115,9 +112,8 @@ public class UploadImgAction extends IPluginAction {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        Log.d("allen", "onActivityResult: " + requestCode + " resultCode" + resultCode);
+        Logger.d("onActivityResult: " + requestCode + " resultCode" + resultCode);
         if (resultCode == 0) {//返回
-            Log.d("allen", "返回");
             return;
         }
         switch (requestCode) {
@@ -159,7 +155,7 @@ public class UploadImgAction extends IPluginAction {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     String str = response.body().string();
-                    Log.i("allen", "uploadPic: " + str);
+                    Logger.i("uploadPic: " + str);
                     JSONObject resultJb = null;
                     try {
 //                        {"status":"200",
@@ -184,20 +180,11 @@ public class UploadImgAction extends IPluginAction {
                         conf.setMaxErrorRetry(2); // 失败后最大重试次数，默认2次
                         OSSLog.enableLog();
                         oss = new OSSClient(mPlugin.cordova.getActivity().getApplicationContext(), "http://oss-cn-shenzhen.aliyuncs.com", credentialProvider, conf);
-
-                        File uploadFile = new File(imageUri.toString());
-                        try {
-                            InputStream input = new FileInputStream(uploadFile);
-                            long fileLength = uploadFile.length();
-                            Log.i("kenshin", "fileLength : " + fileLength);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
                         PutObjectRequest put = new PutObjectRequest("ygsh", imgName, imageUri.getPath());
                         OSSAsyncTask task = oss.asyncPutObject(put, new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
                             @Override
                             public void onSuccess(PutObjectRequest request, PutObjectResult result) {
-                                Log.d("kenshin", "UploadSuccess");
+                                Logger.d("UploadSuccess");
                                 JSONObject callbackJsonObject = new JSONObject();
                                 try {
 //                    {code: 成功1，失败0, msg: 描述, imgUrl: [2017-03/12345.jpg,2017-03/12346.jpg]}
@@ -208,7 +195,6 @@ public class UploadImgAction extends IPluginAction {
                                     callbackJsonObject.put("imgUrl", array);
                                     JSONObject data = JsonWrapUtils.wrapData(callbackJsonObject);
                                     mCallbackContext.success(data);
-                                    Log.i("allen", "callbackMessage : " + data.toString());
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -223,10 +209,10 @@ public class UploadImgAction extends IPluginAction {
                                 }
                                 if (serviceException != null) {
                                     // 服务异常
-                                    Log.e("kenshin", serviceException.getErrorCode());
-                                    Log.e("kenshin", serviceException.getRequestId());
-                                    Log.e("kenshin", serviceException.getHostId());
-                                    Log.e("kenshin", serviceException.getRawMessage());
+                                    Logger.e(serviceException.getErrorCode());
+                                    Logger.e(serviceException.getRequestId());
+                                    Logger.e(serviceException.getHostId());
+                                    Logger.e(serviceException.getRawMessage());
                                 }
                             }
                         });
