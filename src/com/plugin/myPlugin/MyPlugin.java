@@ -5,9 +5,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.util.Log;
 import android.widget.Toast;
 
+import com.orhanobut.logger.Logger;
 import com.plugin.myPlugin.factory.IPluginAction;
 import com.plugin.myPlugin.factory.PluginActionFactory;
 
@@ -24,7 +24,6 @@ import java.util.List;
  * This class echoes a string called from JavaScript.
  */
 public class MyPlugin extends CordovaPlugin {
-    private static final String TAG = "MyPlugin";
     private IPluginAction mPluginAction;
     private Activity mActivity;
     private JSONObject mJsonObject;
@@ -35,7 +34,7 @@ public class MyPlugin extends CordovaPlugin {
         if (args.length() <= 0) {
             return false;
         }
-        Log.i(TAG, "Plugin execute action = " + action + " , args = " + args.toString());
+        Logger.i("Plugin execute action = " + action + " , args = " + args);
         try {
             mJsonObject = args.getJSONObject(0);
         } catch (JSONException e) {
@@ -55,7 +54,7 @@ public class MyPlugin extends CordovaPlugin {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        Log.d(TAG, "onActivityResult: " + requestCode + "resultCode" + resultCode);
+        Logger.d("onActivityResult: " + requestCode + " resultCode" + resultCode);
         if (mPluginAction != null) {
             mPluginAction.onActivityResult(requestCode, resultCode, intent);
         }
@@ -72,7 +71,7 @@ public class MyPlugin extends CordovaPlugin {
      */
     @Override
     public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
-        Log.i(TAG, "onRequestPermissionResult: requestCode" + requestCode);
+        Logger.d("onRequestPermissionResult: requestCode" + requestCode);
         switch (requestCode) {
             case 1:
                 if (grantResults.length > 0) {

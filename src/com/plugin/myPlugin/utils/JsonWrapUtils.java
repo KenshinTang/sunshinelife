@@ -1,6 +1,6 @@
 package com.plugin.myPlugin.utils;
 
-import android.util.Log;
+import com.orhanobut.logger.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +12,6 @@ import org.json.JSONObject;
  */
 
 public class JsonWrapUtils {
-    private static final String TAG = "JsonWrapUtils";
     public static JSONObject wrapData(JSONObject jsonObject) {
         JSONObject result = new JSONObject();
         try {
@@ -20,7 +19,7 @@ public class JsonWrapUtils {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.i(TAG, "result callback" + jsonObject);
+        Logger.d("result callback" + jsonObject);
         return result;
     }
 }
