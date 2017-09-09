@@ -41,9 +41,6 @@ public class GetPushTokenAction extends IPluginAction {
 
     private boolean checkToken(String token) {
         //UMeng的推送Token, 长度固定为44位
-        if (TextUtils.isEmpty(token) || token.length() != 44) {
-            return false;
-        }
-        return true;
+        return !TextUtils.isEmpty(token) && token.length() == 44;
     }
 }
