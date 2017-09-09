@@ -17,14 +17,13 @@ import org.json.JSONObject;
  */
 
 public class GetLocationAction extends IPluginAction {
-    private LocationClient mLocationClient;
 
     //    {"code":1成功,0失败，"msg":"描述”,“lat”:”纬度” , “lng”: “经度”}
     @Override
     public void doAction(final CordovaPlugin plugin, JSONObject jsonObject, final CallbackContext callbackContext) {
-        mLocationClient = new LocationClient(plugin.cordova.getActivity());
+        LocationClient locationClient = new LocationClient(plugin.cordova.getActivity());
         // 注册监听函数
-        mLocationClient.registerLocationListener(new BDLocationListener() {
+        locationClient.registerLocationListener(new BDLocationListener() {
             //1.接收异步返回的定位结果，参数是BDLocation类型参数。
             @Override
             public void onReceiveLocation(BDLocation bdLocation) {
@@ -38,6 +37,7 @@ public class GetLocationAction extends IPluginAction {
                         object.put("msg", "定位失败");
                         callbackContext.error(JsonWrapUtils.wrapData(object));
                     } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 } else {
                     //定位成功
@@ -55,10 +55,11 @@ public class GetLocationAction extends IPluginAction {
                         object.put("lng", lng);
                         callbackContext.success(JsonWrapUtils.wrapData(object));
                     } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }
         });
-        mLocationClient.start();
+        locationClient.start();
     }
 }

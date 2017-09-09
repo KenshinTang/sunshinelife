@@ -1,5 +1,7 @@
 package com.plugin.myPlugin.bean;
 
+import android.text.TextUtils;
+
 import java.io.Serializable;
 
 /**
@@ -32,6 +34,16 @@ public class LocationBean implements Serializable{
     private String city;
     private String county;
     private String addr;
+
+    public LocationBean() {
+
+    }
+
+    public LocationBean(Double lat, Double lng, String address) {
+        location_adress = address;
+        location_lat = lat;
+        location_lng = lng;
+    }
 
     public int getCode() {
         return code;
@@ -113,4 +125,12 @@ public class LocationBean implements Serializable{
         this.addr = addr;
     }
 
+    public boolean isValid() {
+        return location_lat != 0.0d && location_lng != 0.0d && !TextUtils.isEmpty(location_adress);
+    }
+
+    @Override
+    public String toString() {
+        return location_adress + "(" + location_lat + ", " + location_lng + ")";
+    }
 }
