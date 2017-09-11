@@ -61,9 +61,9 @@ public class PayAction extends IPluginAction {
         mPlugin.cordova.getActivity().registerReceiver(mWechatPayCallbackReceiver, new IntentFilter(ACTION_WECHAT_CALLBACK));
 
         // 通过订单号跑订单接口信息接口获取订单信息, 然后再根据订单信息下单支付.
-//        getOrderInfo(type, orderId);
+        getOrderInfo(type, orderId);
 //        getOrderInfo(PAY_TYPE_ALIPAY, orderId);
-        getOrderInfo(PAY_TYPE_WECHAT, orderId);
+//        getOrderInfo(PAY_TYPE_WECHAT, orderId);
     }
 
     private void getOrderInfo(final String type, String orderId) {
