@@ -7,7 +7,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.telecom.Call;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;

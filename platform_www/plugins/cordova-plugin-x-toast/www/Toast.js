@@ -98,4 +98,5 @@ Toast.install = function () {
 };
 
 cordova.addConstructor(Toast.install);
+
 });

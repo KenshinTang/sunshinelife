@@ -191,7 +191,8 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
 
         //Determine whether we're in debug or release mode, and turn on Debugging!
         ApplicationInfo appInfo = webView.getContext().getApplicationContext().getApplicationInfo();
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+        if ((appInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0 &&
+            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
             enableRemoteDebugging();
         }
 

@@ -38,6 +38,8 @@ var AJAX={
           //CommonFunction.remove('__utoken');
           //Comm.gotop("login.html");
           //Comm.message("");
+        } else if (a.code == 140) {
+          err&&err("绑定手机号参数缺失", 140);
         } else {
           err&&err(a.msg);
         }
