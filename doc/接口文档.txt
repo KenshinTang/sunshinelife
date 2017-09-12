@@ -44,13 +44,14 @@ http://39.108.54.14:8080/ygsh/doc.html
 
 	arg0 = {type: 种类（1微信，2QQ）}
 
-	回调 :  {data:{code: 成功1，失败0
-         		msg: 描述
-         		unionid:平台ID
-         		face:用户头像url
-         		nikename:昵称
-         		sex:性别（男，女，未知）
-         		city:城市（如果没有就为空）}}
+	回调 : {data:{code: 成功1，失败0
+		msg: 描述
+		openid:平台openid
+		unionid:平台unionid
+		headimgurl:用户头像url
+		nickname:昵称
+		sex:性别（男，女，未知）
+		city:城市（如果没有就为空）}}
 
 5.支付【回调返回】
 	exec(success, error, "MyPlugin", "payMethod", [arg0]);
