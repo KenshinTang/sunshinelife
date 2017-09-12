@@ -24,18 +24,20 @@ import cn.sharesdk.wechat.friends.Wechat;
 
 /**
  * Created by YX on 2017/8/20.
- * /*            回调 : {	code: 成功1，失败0
+ *
+ * {data:{code: 成功1，失败0
  msg: 描述
- unionid:平台ID
- face:用户头像url
- nikename:昵称
+ openid:平台openid
+ unionid:平台unionid
+ headimgurl:用户头像url
+ nickname:昵称
  sex:性别（男，女，未知）
- city:城市（如果没有就为空）}
+ city:城市（如果没有就为空）}}
  */
 
 public class LoginAction extends IPluginAction {
-    public static final int LOGINTYPE_WECHAT = 1;
-    public static final int LOGINTYPE_QQ = 2;
+    private static final int LOGINTYPE_WECHAT = 1;
+    private static final int LOGINTYPE_QQ = 2;
     private static final String TAG = "LoginAction";
 
     @Override
@@ -79,9 +81,11 @@ public class LoginAction extends IPluginAction {
                 try {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("code", 1);
-                    jsonObject.put("unionid", map.get("uid"));
-                    jsonObject.put("face", map.get("iconurl"));
-                    jsonObject.put("nikename", map.get("name"));
+                    jsonObject.put("msg", "授权成功!");
+                    jsonObject.put("openid", map.get("openid"));
+                    jsonObject.put("unionid", map.get("unionid"));
+                    jsonObject.put("headimgurl", map.get("iconurl"));
+                    jsonObject.put("nickname", map.get("name"));
                     jsonObject.put("sex", map.get("gender"));
                     jsonObject.put("city", map.get("city"));
                     callbackContext.success(JsonWrapUtils.wrapData(jsonObject));
