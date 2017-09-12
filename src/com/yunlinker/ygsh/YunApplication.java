@@ -56,6 +56,7 @@ public class YunApplication extends Application {
         //分享和登录的SDK
         Config.DEBUG = true;
         ContextUtil.setContext(this);
+        //微信登录和支付的id,key, 注: 支付用的是另一个id和key
         PlatformConfig.setWeixin("wxd3769510490f1c98", "210b2c1a2208a804adeda8b14ee5dcb7");
         PlatformConfig.setQQZone("1105543710", "WcTA1g0pEeT50ccg");
 
