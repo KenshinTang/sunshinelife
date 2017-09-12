@@ -27,7 +27,7 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
         super.onCreate(savedInstanceState);
 
         // 支付的id和key, 和登录的不一样!!
-        // "wxd46fd7b11f8fb67f", "ae71ec7670176dc478a86dafdef48462"
+        // "wxd46fd7b11f8fb67f", "6c5f2d134ad41ae80424c4d1e75ee36a"
         mIWXAPI = WXAPIFactory.createWXAPI(this, "wxd46fd7b11f8fb67f");
         mIWXAPI.handleIntent(getIntent(), this);
     }
