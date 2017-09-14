@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Environment;
@@ -38,6 +40,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -73,14 +77,14 @@ public class UploadImgAction extends IPluginAction {
     public void doAction(final CordovaPlugin plugin, JSONObject jsonObject, CallbackContext callbackContext) {
         LayoutInflater inflater = LayoutInflater.from(plugin.cordova.getActivity());
         View view = inflater.inflate(R.layout.popup_take_photo_layout, null);
-        this.mPlugin = plugin;
-        this.mJSONObject = jsonObject;
+        mPlugin = plugin;
+        mJSONObject = jsonObject;
         try {
-            this.mCount = jsonObject.getInt("count");
+            mCount = jsonObject.getInt("count");
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        this.mCallbackContext = callbackContext;
+        mCallbackContext = callbackContext;
         mPopupWindow = new PopupWindow(view,
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT);
@@ -233,9 +237,12 @@ public class UploadImgAction extends IPluginAction {
                         String path;
                         if (imageUri.getScheme().equals("content")) {
                             path = getRealFilePath(mPlugin.cordova.getActivity(), imageUri);
+                            // 缩放图片,减小size以便快速上传.
+                            path = scalePic(path, 800f);
                         } else {
                             path = imageUri.getPath();
                         }
+
                         PutObjectRequest put = new PutObjectRequest("ygsh", imgName, path);
                         OSSAsyncTask task = oss.asyncPutObject(put, new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
                             @Override
@@ -279,6 +286,39 @@ public class UploadImgAction extends IPluginAction {
             });
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    private String scalePic(String path, float maxHW) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        //TODO: 没必要先加载到内存中.
+//        options.inJustDecodeBounds = true;
+        Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+        int imageHeight = options.outHeight;
+        int imageWidth = options.outWidth;
+//        options.inJustDecodeBounds = false;
+        if (imageHeight <= maxHW && imageWidth <= maxHW) {
+            return path;
+        } else {
+            String outFilePath = Uri.parse("file:///" + Environment.getExternalStorageDirectory().getPath() + "/" + mFilename).getPath();
+            File file = new File(outFilePath);
+            try {
+                float scale = maxHW / Math.max(imageHeight, imageWidth);
+                Matrix matrix = new Matrix();
+                matrix.postScale(scale, scale);
+                Logger.i("scale imgage: " + scale);
+
+                Bitmap scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, imageWidth, imageHeight, matrix, true);
+
+                FileOutputStream out = new FileOutputStream(file);
+                if (scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)) {
+                    out.flush();
+                    out.close();
+                }
+            } catch (Exception e) {
+                Logger.e(e, "", "");
+            }
+            return file.getPath();
         }
     }
 
