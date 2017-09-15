@@ -3,7 +3,7 @@ var Config={
 	root:'http://39.108.54.14:8080/ygsh/',//接口根路径url
 	ossroot:'https://ygsh.oss-cn-shenzhen.aliyuncs.com/',//oss根路径
   pagesize:10,
-  isApp: true
+  isApp: false
 };
 
 var AJAX={
@@ -38,8 +38,6 @@ var AJAX={
           //CommonFunction.remove('__utoken');
           //Comm.gotop("login.html");
           //Comm.message("");
-        } else if (a.code == 140) {
-          err&&err("绑定手机号参数缺失", 140);
         } else {
           err&&err(a.msg);
         }
@@ -166,16 +164,16 @@ var CommonFunction = {
     console.log(a, b, c);
   },
   save: function (key, obj) {
-    key = 'ygsh_y_' + key;
+    key = 'ygsh_s_' + key;
     localStorage.setItem(key, JSON.stringify(obj));
   },
   get: function (key) {
-    key = 'ygsh_y_' + key;
+    key = 'ygsh_s_' + key;
     var obj = JSON.parse(localStorage.getItem(key));
     return obj;
   },
   remove: function (key) {
-    key = 'ygsh_y_' + key;
+    key = 'ygsh_s_' + key;
     localStorage.removeItem(key);
   },
   //获取主价格

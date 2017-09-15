@@ -30,7 +30,8 @@ public class YunApplication extends Application {
         super.onCreate();
 //        initMobSDK();
         initUmengSDK();
-        initBaiduSDK();
+        //商户端只有上传图片和推送功能
+//        initBaiduSDK();
         PluginActionFactory.initProperties();
         // android 7.0系统解决拍照的问题
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
@@ -52,13 +53,14 @@ public class YunApplication extends Application {
         SDKInitializer.setCoordType(CoordType.BD09LL);
     }
 
+    //商户端只有上传图片和推送功能
     private void initUmengSDK() {
         //分享和登录的SDK
         Config.DEBUG = true;
         ContextUtil.setContext(this);
         //PlatformConfig.setWeixin("wxd3769510490f1c98", "210b2c1a2208a804adeda8b14ee5dcb7");  //没有支付功能
-        PlatformConfig.setWeixin("wxd46fd7b11f8fb67f", "6c5f2d134ad41ae80424c4d1e75ee36a");
-        PlatformConfig.setQQZone("1105543710", "WcTA1g0pEeT50ccg");
+//        PlatformConfig.setWeixin("wxd46fd7b11f8fb67f", "6c5f2d134ad41ae80424c4d1e75ee36a");
+//        PlatformConfig.setQQZone("1105543710", "WcTA1g0pEeT50ccg");
 
         //消息推送的SDK
         PushAgent.getInstance(this).register(new IUmengRegisterCallback() {
