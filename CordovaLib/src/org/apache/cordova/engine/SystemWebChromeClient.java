@@ -18,11 +18,10 @@
 */
 package org.apache.cordova.engine;
 
-import java.util.Arrays;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -33,11 +32,11 @@ import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions.Callback;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
+import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
-import android.webkit.PermissionRequest;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -45,6 +44,8 @@ import android.widget.RelativeLayout;
 import org.apache.cordova.CordovaDialogsHelper;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.LOG;
+
+import java.util.Arrays;
 
 /**
  * This class is the WebChromeClient that implements callbacks for our web view.

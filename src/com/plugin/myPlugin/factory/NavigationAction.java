@@ -19,14 +19,12 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.orhanobut.logger.Logger;
 import com.plugin.myPlugin.bean.LocationBean;
-import com.plugin.myPlugin.utils.JsonWrapUtils;
 import com.plugin.myPlugin.utils.SharedPreferencesHelper;
 import com.yunlinker.ygsh.R;
 import com.yunlinker.ygsh.util.ToastUtil;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.LinkedList;

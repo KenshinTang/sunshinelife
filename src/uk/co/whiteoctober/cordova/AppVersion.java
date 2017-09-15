@@ -1,14 +1,13 @@
 package uk.co.whiteoctober.cordova;
 
-import org.apache.cordova.CordovaPlugin;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+
 import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.PackageManager;
 
 public class AppVersion extends CordovaPlugin {
   @Override

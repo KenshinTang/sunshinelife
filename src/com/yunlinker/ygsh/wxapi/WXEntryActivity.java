@@ -8,14 +8,7 @@
 
 package com.yunlinker.ygsh.wxapi;
 
-import android.content.Intent;
-import android.widget.Toast;
-
 import com.umeng.socialize.weixin.view.WXCallbackActivity;
-
-import cn.sharesdk.wechat.utils.WXAppExtendObject;
-import cn.sharesdk.wechat.utils.WXMediaMessage;
-import cn.sharesdk.wechat.utils.WechatHandlerActivity;
 
 /** Umeng分享微信客户端回调activity示例 */
 public class WXEntryActivity extends WXCallbackActivity {
