@@ -5,7 +5,6 @@ import android.os.StrictMode;
 
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
-import com.mob.MobSDK;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 import com.plugin.myPlugin.factory.PluginActionFactory;
@@ -28,7 +27,6 @@ public class YunApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-//        initMobSDK();
         initUmengSDK();
         initBaiduSDK();
         PluginActionFactory.initProperties();
@@ -37,11 +35,6 @@ public class YunApplication extends Application {
         StrictMode.setVmPolicy(builder.build());
         builder.detectFileUriExposure();
         Logger.addLogAdapter(new AndroidLogAdapter());
-    }
-
-    private void initMobSDK() {
-        //初始化一键分享SDK
-        MobSDK.init(this, "1fe4899e8e58d", "8b76d42bc1e794a19b8864ee00010ed1");
     }
 
     private void initBaiduSDK() {

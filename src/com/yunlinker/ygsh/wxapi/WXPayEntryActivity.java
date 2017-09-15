@@ -4,7 +4,6 @@ package com.yunlinker.ygsh.wxapi;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.orhanobut.logger.Logger;
 import com.plugin.myPlugin.factory.PayAction;

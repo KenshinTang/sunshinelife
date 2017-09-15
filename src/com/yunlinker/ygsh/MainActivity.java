@@ -22,11 +22,10 @@ package com.yunlinker.ygsh;
 import android.content.Intent;
 import android.os.Bundle;
 
-
 import com.umeng.message.PushAgent;
 import com.umeng.socialize.UMShareAPI;
 
-import org.apache.cordova.*;
+import org.apache.cordova.CordovaActivity;
 
 public class MainActivity extends CordovaActivity
 {
