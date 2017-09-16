@@ -30,7 +30,7 @@ buildscript {
     // http://tools.android.com/tech-docs/new-build-system/version-compatibility
     // and https://issues.apache.org/jira/browse/CB-8143
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.0-beta6'
     }
 }
 
@@ -250,10 +250,11 @@ android {
 dependencies {
     compile fileTree(include: '*.jar', dir: 'libs')
     // SUB-PROJECT DEPENDENCIES START
-    debugCompile project(path: 'CordovaLib', configuration: 'debug')
-    releaseCompile project(path: 'CordovaLib', configuration: 'release')
+//    debugCompile project(path: 'CordovaLib', configuration: 'debug')
+//    releaseCompile project(path: 'CordovaLib', configuration: 'release')
     // SUB-PROJECT DEPENDENCIES END
     compile project(':UMengPushLib')
+    compile project(':CordovaLib')
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.code.gson:gson:2.8.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
