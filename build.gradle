@@ -166,7 +166,7 @@ android {
 
     defaultConfig {
         versionCode cdvVersionCode ?: new BigInteger("" + privateHelpers.extractIntFromManifest("versionCode"))
-        applicationId privateHelpers.extractStringFromManifest("package")
+        applicationId "com.yunlinker.ygsh.ps"
 
         if (cdvMinSdkVersion != null) {
             minSdkVersion cdvMinSdkVersion

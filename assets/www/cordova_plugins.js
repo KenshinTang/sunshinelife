@@ -52,23 +52,6 @@ module.exports = [
         "id": "cordova-plugin-x-toast.tests",
         "file": "plugins/cordova-plugin-x-toast/test/tests.js",
         "pluginId": "cordova-plugin-x-toast"
-    },
-    {
-        "id": "ionic-plugin-keyboard.keyboard",
-        "file": "plugins/ionic-plugin-keyboard/www/android/keyboard.js",
-        "pluginId": "ionic-plugin-keyboard",
-        "clobbers": [
-            "cordova.plugins.Keyboard"
-        ],
-        "runs": true
-    },
-    {
-        "id": "phonegap-plugin-barcodescanner.BarcodeScanner",
-        "file": "plugins/phonegap-plugin-barcodescanner/www/barcodescanner.js",
-        "pluginId": "phonegap-plugin-barcodescanner",
-        "clobbers": [
-            "cordova.plugins.barcodeScanner"
-        ]
     }
 ];
 module.exports.metadata = 
@@ -76,16 +59,12 @@ module.exports.metadata =
 {
     "com.plugin.myPlugin": "0.0.1",
     "cordova-plugin-app-version": "0.1.9",
-    "cordova-plugin-compat": "1.1.0",
     "cordova-plugin-console": "1.0.5",
     "cordova-plugin-device": "1.1.4",
     "cordova-plugin-splashscreen": "4.0.3",
     "cordova-plugin-statusbar": "2.2.2",
-    "cordova-plugin-swift-support": "3.1.1",
     "cordova-plugin-whitelist": "1.3.1",
-    "cordova-plugin-x-toast": "2.6.0",
-    "ionic-plugin-keyboard": "2.2.1",
-    "phonegap-plugin-barcodescanner": "6.0.8"
+    "cordova-plugin-x-toast": "2.6.0"
 };
 // BOTTOM OF METADATA
 });

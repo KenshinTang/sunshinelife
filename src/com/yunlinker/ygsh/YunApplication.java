@@ -28,7 +28,7 @@ public class YunApplication extends Application {
     public void onCreate() {
         super.onCreate();
         initUmengSDK();
-        initBaiduSDK();
+//        initBaiduSDK();
         PluginActionFactory.initProperties();
         // android 7.0系统解决拍照的问题
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();

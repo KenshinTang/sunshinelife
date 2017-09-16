@@ -33,12 +33,4 @@ exports.getLatLngMethod = function(arg0, success, error) {
   exec(success, error, "MyPlugin", "getLatLngMethod", [arg0]);
 };
 
-exports.navigationMethod = function(arg0, success, error) {
-  exec(success, error, "MyPlugin", "navigationMethod", [arg0]);
-};
-
-exports.scanCodePayMethod = function(arg0, success, error) {
-  exec(success, error, "MyPlugin", "scanCodePayMethod", [arg0]);
-};
-
 });

@@ -505,10 +505,6 @@ img{
 .gF7F6F2{
   background:#F7F6F2;
 }
-.codeColor{
-  border: 1px solid #D5D5D5 !important;
-  color: #D5D5D5 !important;
-}
 /*@font-face {*/
 /*font-family: 'yaheinoB';   !*字体名称*!*/
 /*src: url('../upfile/font/yaheinoB.ttf');       !*字体源文件*!*/
@@ -538,7 +534,39 @@ img{
   font-size: 16px;
   line-height: 55px;
 }
-
+.arrowright2{
+  background-image:url(../img/arrowright2.png);
+}
+.clear{
+  background-image:url(../img/clear.png);
+}
+.comm-t > div{
+  -webkit-box-flex: 1;
+  box-flex: 1;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  font-size: 16px;
+}
+.comm-t-active{
+  color: #FD832F;
+  border-bottom: 2px solid #FD832F;
+}
+.comm-a{
+  height:50px;
+  line-height:50px;
+  overflow: hidden;
+  padding:0px 15px;
+}
+.comm-a > div{
+  height:100%;
+}
+.comm-a-l{
+  float:left;
+}
+.comm-a-r{
+  float:right;
+}
 
 .ionic-top-pad{
   padding-left: 0px;
@@ -594,7 +622,7 @@ img{
   content: '' !important;
   height: 30px !important;
   display: block !important;
-  background-image: url(../img/washClothes1.png) !important;
+  background-image: url(../img/stores1.png) !important;
   background-repeat:no-repeat !important;
   background-position:center center !important;
   background-size: 16px !important;
@@ -603,7 +631,7 @@ img{
   content: '' !important;
   height: 30px !important;
   display: block !important;
-  background-image: url(../img/washClothes.png) !important;
+  background-image: url(../img/stores.png) !important;
   background-repeat:no-repeat !important;
   background-position:center center !important;
   background-size: 16px !important;
@@ -650,9 +678,76 @@ img{
 .tabs-md .tab-button[aria-selected=true] .tab-button-icon {
   color: #FD832F;
 }
-.select-ios .select-icon .select-icon-inner, .select-md .select-icon .select-icon-inner{
-  left: 2px !important;
+
+
+.delete-able-item{
+  position: relative;
+  transition: transform .3s;
 }
-.ios .ion-page.show-page ~ .nav-decor{
-  background-color:white !important;
+.delete-able-item:before,
+.ch-delete-bar .all:before{
+  content: " ";
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: -15px;
+  top: 50%;
+  margin-top: -10px;
+  background: url(../img/select-n.png) no-repeat center center;
+  background-size: 20px;
+  display: none;
+}
+.delete-able-item.on:before,
+.ch-delete-bar .all.on:before {
+  background-image: url(../img/select-y.png)
+}
+.delete-content .delete-able-item {
+  transform:translateX(30px);
+}
+.delete-content .delete-able-item:before,.ch-delete-bar .all:before {
+  display: inline-block;
+}
+.ch-delete-bar .all:before {
+  left: 10px;
+}
+.ch-footer-holder {
+  height:50px;
+}
+.ch-footer-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 50px;
+  background: #ffffff;
+  border-top: 1px solid #ededed;
+}
+.ch-delete-bar .all {
+  width: 80px;
+  color: #000;
+  font-size: 16px;
+  float: left;
+  line-height: 50px;
+  text-indent: 40px;
+}
+
+.ch-delete-bar .btn {
+  float: right;
+  width: 80px;
+  line-height: 50px;
+  background: #FD832F;
+  color: #fff;
+  text-align: center;
+}
+.elli{overflow:hidden;text-overflow:ellipsis; -o-text-overflow:ellipsis;white-space:nowrap;}
+.ch-upload-field {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top:0 ;
+  bottom:0;
+  opacity: 0;
+}
+.ch-enable{
+  background-color: #FD832F;
 }

@@ -1,28 +1,32 @@
 /*全局配置*/
 var Config={
-	root:'http://39.108.54.14:8080/ygsh/',//接口根路径url
-	ossroot:'https://ygsh.oss-cn-shenzhen.aliyuncs.com/',//oss根路径
+	root:'http://192.168.1.199:8090/zxbb/',//接口根路径url
+  //root:'http://192.168.8.100:8082/zxbb/',//接口根路径url
+	webroot:'',//测试网页接口
+	isTest:false,//是否测试（开发为true，上线为false）
+	ossroot:'http://asba-upload.oss-cn-shenzhen.aliyuncs.com/',//oss根路径
   pagesize:10,
-  isApp: true
+  isApp: false
 };
+
+//$.ajax({
+//  type: "get",
+//  url: "http://39.108.89.213:8080/zxbb/api/goods/main/list?home=1&cheap=1&pageno=1&pagesize=10",
+//  timeout:5000,
+//
+//  success: function(data,status){
+//    console.log(data,status);
+//    console.log(11);
+//  },
+//  error: function(data,status){
+//    console.log(data,status);
+//    console.log(22);
+//  },
+//});
 
 var AJAX={
   url:function(){return "http://39.108.54.14:8080/ygsh/"},
   get:function(api, obj, cb, err){
-    var user = CommonFunction.get("user");
-    if (user) {
-      obj.appid = user.appid;
-      obj.timestamp = user.timestamp;
-      obj = this.objKeySort(obj);
-      obj.token = user.token;
-      var arr1 = [];
-      for (var i in obj) {
-        arr1.push(i + "=" + obj[i]);
-      }
-      obj.sign = hex_md5(arr1.join("&")).toUpperCase();
-      delete obj.token;
-    }
-
     $.ajax({
       type: "get",
       url:AJAX.url()+api,
@@ -33,37 +37,21 @@ var AJAX={
         if(a.code == 1) {
           cb&&cb(a.data);
         } else if (a.code == 110) {
-          err&&err("该账号已在其他地方登录", 110);
           //CommonFunction.remove('user');
           //CommonFunction.remove('__utoken');
           //Comm.gotop("login.html");
-          //Comm.message("");
-        } else if (a.code == 140) {
-          err&&err("绑定手机号参数缺失", 140);
+          //Comm.message("该账号已在其他地方登录");
         } else {
           err&&err(a.msg);
         }
       },
       error: function () {
-        err&&err("网络错误");
+        console.log(a);
+        AJAX.err(api);
       },
     });
   },
   post:function(api, obj, cb, err){
-    var user = CommonFunction.get("user");
-    if (user) {
-      obj.appid = user.appid;
-      obj.timestamp = user.timestamp;
-      obj = this.objKeySort(obj);
-      obj.token = user.token;
-      var arr1 = [];
-      for (var i in obj) {
-        arr1.push(i + "=" + obj[i]);
-      }
-      obj.sign = hex_md5(arr1.join("&")).toUpperCase();
-      delete obj.token;
-    }
-
     $.ajax({
       type: "post",
       url:AJAX.url()+api,
@@ -83,18 +71,37 @@ var AJAX={
         }
       },
       error: function () {
-        err&&err("网络错误");
+        console.log(a);
+        AJAX.err(api);
       },
     });
   },
-  objKeySort: function(obj) {//排序的函数
-    var newkey = Object.keys(obj).sort();
-    //先用Object内置类的keys方法获取要排序对象的属性名，再利用Array原型上的sort方法对获取的属性名进行排序，newkey是一个数组
-    var newObj = {};//创建一个新的对象，用于存放排好序的键值对
-    for (var i = 0; i < newkey.length; i++) {//遍历newkey数组
-      newObj[newkey[i]] = obj[newkey[i]];//向新创建的对象中按照排好的顺序依次增加键值对
+  err:function(a){
+    //Comm.loading();
+    //Comm.message('网络异常',1);
+  },
+  setTag:function(a,b){
+    AJAX.ab(a,b);
+  },
+  isLogin:function(){
+    return AJAX.ab()!=null;
+  },
+  authError:function () {
+    AJAX.authError=null;
+  },
+  ab:function(a,b){
+    if(a&&b)
+      Comm.db(AJAX.K(),a+'_'+b);
+    else{
+      var k=SysConfig.get(AJAX.K());
+      if(k&&k.length>5){
+        var t=k.split('_');
+        if(t.length==2){
+          return {a:t[0],b:t[1],c:k}
+        }
+      }
     }
-    return newObj;//返回排好序的新对象
+    return null;
   }
 };
 
@@ -165,17 +172,7 @@ var CommonFunction = {
   print: function (a, b, c) {
     console.log(a, b, c);
   },
-  save: function (key, obj) {
-    key = 'ygsh_y_' + key;
-    localStorage.setItem(key, JSON.stringify(obj));
-  },
-  get: function (key) {
-    key = 'ygsh_y_' + key;
-    var obj = JSON.parse(localStorage.getItem(key));
-    return obj;
-  },
   remove: function (key) {
-    key = 'ygsh_y_' + key;
     localStorage.removeItem(key);
   },
   //获取主价格
@@ -296,14 +293,6 @@ var CommonFunction = {
     }
     return returndata;
   },
-  removeEmoji: function(id) {
-    var regStr = /[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF][\u200D|\uFE0F]|[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF]|[0-9|*|#]\uFE0F\u20E3|[0-9|#]\u20E3|[\u203C-\u3299]\uFE0F\u200D|[\u203C-\u3299]\uFE0F|[\u2122-\u2B55]|\u303D|[\A9|\AE]\u3030|\uA9|\uAE|\u3030/ig;
-    var org_val = $("#" + id).val().toString();
-
-    if(regStr.test(org_val)){
-      $("#" + id).val(org_val.replace(regStr,""));
-    }
-  }
 };
 
 
@@ -563,7 +552,7 @@ function area2(areaPicker, argustemp, cb) {
   });
 }
 
-function showPicker(ee, areaPicker, argustemp, id) {
+function showPicker(ee, areaPicker, argustemp) {
   var e = ee.target;
   console.log(e);
   if(areaPicker){
@@ -571,60 +560,57 @@ function showPicker(ee, areaPicker, argustemp, id) {
       var aid = null;
       for(var i=0;i<v.length;i++){if(v[i].value)aid=v[i].value;}
       var at = (v.length>0&&v[0].text?v[0].text+' ':'') + (v.length>1&&v[1].text?v[1].text+' ':'') + (v.length>2&&v[2].text?v[2].text+' ':'');
-      $("#" + id).val(at).attr("data", aid).css('color', '#001111');
+      $(".input").val(at).attr("data", aid).css('color', '#001111');
     })
   } else {
     argustemp=arguments;
   }
 }
 
-//function slider(gallery, cb) {
-//  gallery = mui('.mui-slider');
-//  gallery.slider({
-//    interval:2000//自动轮播周期，若为0则不自动播放，默认为0；
-//  });
-//  cb && cb(gallery);
-//}
+function slider(gallery, cb) {
+  gallery = mui('.mui-slider');
+  gallery.slider({
+    interval:2000//自动轮播周期，若为0则不自动播放，默认为0；
+  });
+  cb && cb(gallery);
+}
 
 //var cordova = require('cordova');
 //console.log(cordova);
 //var nativeApiProvider = require('cordova/android/nativeapiprovider');
-//var code = {};
-//var nativeFunction = {
-//  //n: 调用函数方法名, jsonObj: JSON格式, cb: 回调, t: 传给原生的时间戳，需要在回调的时候返回相同的时间戳
-//  nativeCall: function (n, jsonObj, cb) {
-//    var t = new Date().getTime();
-//    code[t] = cb;
-//    console.log(code);
-//    //native_fns(n, jsonObj, t);
-//    window._cordovaNative.toastMessage(jsonObj, t);
-//  },
-//  //d: JSON格式返回对象比如{code: 1, msg: 2}, t: 返回的时间戳
-//  nativeCallback2: function (d, t) {
-//    var f = code[t];
-//    if(typeof f == 'function') {
-//      console.log(f);
-//      f(d);
-//    }
-//  },
-//  nativeCallback: function (d) {
-//    $(".data1").html(d);
-//  },
-//  test1: function(n, jsonObj, cb) {
-//    var t = new Date().getTime();
-//    code[t] = cb;
-//    window._cordovaNative.toastMessage(jsonObj, t);
-//  },
-//  test2: function(n, jsonObj, cb) {
-//    var t = new Date().getTime();
-//    code[t] = cb;
-//    nativeApiProvider.get().toastMessage(jsonObj, t);
-//  },
-//  test3: function(n, jsonObj, cb, err) {
-//    console.log("test");
-//    $(".data0").html("test");
-//    var t = new Date().getTime();
-//    code[t] = cb;
-//    CusPlugin.testMethod(cb, err, {});
-//  }
-//}
+var code = {};
+var nativeFunction = {
+  //n: 调用函数方法名, jsonObj: JSON格式, cb: 回调, t: 传给原生的时间戳，需要在回调的时候返回相同的时间戳
+  nativeCall: function (n, jsonObj, cb) {
+    var t = new Date().getTime();
+    code[t] = cb;
+    console.log(code);
+    //native_fns(n, jsonObj, t);
+    window._cordovaNative.toastMessage(jsonObj, t);
+  },
+  //d: JSON格式返回对象比如{code: 1, msg: 2}, t: 返回的时间戳
+  nativeCallback2: function (d, t) {
+    var f = code[t];
+    if(typeof f == 'function') {
+      console.log(f);
+      f(d);
+    }
+  },
+  nativeCallback: function (d) {
+    $(".data1").html(d);
+  },
+  test1: function(n, jsonObj, cb) {
+    var t = new Date().getTime();
+    code[t] = cb;
+    window._cordovaNative.toastMessage(jsonObj, t);
+  },
+  test2: function(n, jsonObj, cb) {
+    var t = new Date().getTime();
+    code[t] = cb;
+    nativeApiProvider.get().toastMessage(jsonObj, t);
+  }
+}
+
+function backUrl() {
+  history.back();
+}
