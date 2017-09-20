@@ -3,7 +3,7 @@ var Config={
 	root:'http://39.108.54.14:8080/ygsh/',//接口根路径url
 	ossroot:'https://ygsh.oss-cn-shenzhen.aliyuncs.com/',//oss根路径
   pagesize:10,
-  isApp: false
+  isApp: true
 };
 
 var AJAX={
