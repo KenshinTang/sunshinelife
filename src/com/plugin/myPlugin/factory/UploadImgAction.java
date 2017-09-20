@@ -32,7 +32,7 @@ import com.alibaba.sdk.android.oss.model.PutObjectRequest;
 import com.alibaba.sdk.android.oss.model.PutObjectResult;
 import com.orhanobut.logger.Logger;
 import com.plugin.myPlugin.utils.JsonWrapUtils;
-import com.yunlinker.ygsh.R;
+import com.yunlinker.ygsh.sh.R;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
