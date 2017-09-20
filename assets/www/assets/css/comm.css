@@ -534,6 +534,10 @@ img{
   font-size: 16px;
   line-height: 55px;
 }
+.tel.ff{
+  display: block;
+  width: 100%;
+}
 .arrowright2{
   background-image:url(../img/arrowright2.png);
 }
@@ -750,4 +754,7 @@ img{
 }
 .ch-enable{
   background-color: #FD832F;
+}
+.st-1 .wor-2-r.arrowright2 {
+  background: none;
 }
