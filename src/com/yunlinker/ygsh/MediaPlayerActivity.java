@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.yunlinker.ygsh.ps.R;
+
 import java.io.IOException;
 
 public class MediaPlayerActivity extends Activity implements SurfaceHolder.Callback {

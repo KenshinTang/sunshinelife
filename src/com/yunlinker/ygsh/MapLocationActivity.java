@@ -54,6 +54,7 @@ import com.baidu.mapapi.search.poi.PoiSearch;
 import com.google.gson.Gson;
 import com.orhanobut.logger.Logger;
 import com.plugin.myPlugin.bean.LocationBean;
+import com.yunlinker.ygsh.ps.R;
 import com.yunlinker.ygsh.view.SearchEditView;
 
 import java.util.ArrayList;
